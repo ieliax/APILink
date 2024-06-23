@@ -23,3 +23,4 @@
      
 </script>
 <button on:click={contactViaWhatsApp}>Contactar por WhatsApp</button>
+<p>HOLA DESDE MI PRUEBA</p>
