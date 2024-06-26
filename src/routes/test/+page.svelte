@@ -10,17 +10,19 @@
 
     
     async function notifyLinkOpened() {
+        
         try {
             const response = await fetch("/api/check-registration", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ uid: "1234",email:"elias.liriano@gmail.com",age:37})
+                body: JSON.stringify({businessID:"12345",userEmail: "elias.liriano@gmail.com"})
             });
-           
-            const data = await response.json();
-            console.log(data);
+
+        
+             const data = await response.json();
+             console.log(data);
         } catch (error) {
             console.log(error);
         }
