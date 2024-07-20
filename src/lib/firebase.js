@@ -1,4 +1,5 @@
 // Import the functions you need from the SDKs you need
+const VITE_FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
@@ -10,7 +11,7 @@ import { getStorage} from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBWiDVuDWfdbFarxCeu-WUsrxj7EnaLAvY",
+  apiKey: VITE_FIREBASE_API_KEY,
   authDomain: "apilink-55977.firebaseapp.com",
   projectId: "apilink-55977",
   storageBucket: "apilink-55977.appspot.com",
