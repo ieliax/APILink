@@ -18,7 +18,7 @@ export const analizerUserInputGPT = async (userInput) => {
    }
 
    `;
-  
+
   // let prompt = `
   // Este GPT actúa como un interruptor analizando consultas de usuarios para determinar si se refieren a preguntas generales y servicio al cliente utiliza ('generalSupportGPT'), asegurando que todas las interacciones reciban una respuesta adecuada. si expresan interés en productos planes o servicio utiliza  ('salesGPT').
   // Responde en formato JSON, donde 'model' será 'generalSupportGPT' o 'salesGPT' según la consulta el campo 'action' contendra el valor 'modelchage', y 'userinput' contendrá la consulta original del usuario. Este formato facilita el uso posterior de la consulta por otros modelos GPT.
@@ -33,7 +33,7 @@ export const analizerUserInputGPT = async (userInput) => {
   //   "userinput": "sabes quiero primero saber donde estan ubicados"
   // }
   // `;
-  
+
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -94,8 +94,6 @@ export const customerServiceGPT = async (userInput) => {
     Paso 4. Responder a la Consulta del Usuario
     Utiliza la información disponible o recién proporcionada por el usuario para responder de manera efectiva a su consulta.
     Acción: Proporciona una respuesta detallada basada en la información disponible, adaptando la respuesta a las necesidades específicas del usuario.
-
-
 
     
    Si un usuario hace una pregunta fuera de contexto con respecto a los productos que ofreces o el negocio Aquí tienes una respuesta de ejemplo que el asistente puede utilizar para manejar esas situaciones:
@@ -399,7 +397,7 @@ export const generalSupportGPT = async (userInput) => {
    Si un usuario hace una pregunta fuera de contexto con respecto a los productos que ofreces o el negocio Aquí tienes una respuesta de ejemplo que el asistente puede utilizar para manejar esas situaciones:
   {Debes dar un respuesta a su pregunta}¿{si el usuario estaba en medio de un proceso de compra debes indicarle si quiere continuar con la compra del producto de lo contrario brindar ayuda adicional}?
   `;
-  
+
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
