@@ -413,11 +413,7 @@
         background-color: blue;
     }
 
-    button {
-        /* width: 100%; */
-        margin: 10px;
-        height: 600px;
-    }
+    
     .chatbox__footer {
         display: flex;
         position: sticky;
