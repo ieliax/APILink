@@ -1,12 +1,12 @@
 // Import the functions you need from the SDKs you need
-const VITE_FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
+// const VITE_FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 
 const firebaseConfig = {
-  apiKey: VITE_FIREBASE_API_KEY,
+  apiKey: "AIzaSyBWiDVuDWfdbFarxCeu-WUsrxj7EnaLAvY",
   authDomain: "apilink-55977.firebaseapp.com",
   projectId: "apilink-55977",
   storageBucket: "apilink-55977.appspot.com",
