@@ -3,7 +3,10 @@
     import UiCreateUserComponent from "../../lib/CreateUserComponent/UICreateUserComponent.svelte";
     import UiAlertComponent from "../../lib/UIAlertComponent/UIAlertComponent.svelte";
     import UiUserPageComponent from "../../lib/UserPageComponent/UIUserPageComponent.svelte";
-    import { pagename } from "../../lib/stores/auth";
+    import { pageInfo } from "../../lib/stores/auth";
+    import { goto } from "$app/navigation";
+    import { userAction } from "../../lib/stores/adminStore";
+    import { collectionByName } from "../../lib/API";
 
 
     let showAlert = false;
@@ -13,9 +16,29 @@
     let pageList = [];
 
     onMount(async () => {
-        let response = await fetchBusinessPage();
-        console.log(data)
+        // fetchBusinessPage();
+        let response = await collectionByName("page");
+        pageList = response;
+        console.log(response)
     });
+
+    async function fetchBusinessPage(){
+        try {
+            let response = await fetch("/api/getAllPage",{
+                method:"GET",
+                headers:{
+                    "Accept":"application/json"
+                }
+            });
+
+            let data = await response.json();
+            let _pagelist = data.documents;
+            pageList = _pagelist;
+            // console.log(_pagelist)
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     function didSelectRowAt(event) {
         const eventType = event.detail.eventType;
@@ -23,11 +46,13 @@
             showAlert = !showAlert;
         } else if (eventType == "cell") {
             let index = event.detail.cellInfo.indexPath;
-             console.log(pageList[index]);
-            pagename.update(name => {
-                return pageList[index];;
-            })
-            // pagename.set("Updated Page Name");
+
+            console.log(pageList[index]);
+        pageInfo.update(info => {
+               return pageList[index]
+        });
+            // pageInfo.set(pageList[index]);
+            // console.log($pageInfo.document.pageid);
         }
     }
 
@@ -89,42 +114,30 @@
         }
     }
 
-    async function fetchBusinessPage(){
-        try {
-            let response = await fetch("/api/getAllPage",{
-                method:"GET",
-                headers:{
-                    "Accept":"application/json"
-                }
-                
-            });
+   
 
-            let data = await response.json();
-            let _pagelist = data.documents;
-            pageList = _pagelist;
-            // console.log(_pagelist)
-        } catch (error) {
-            console.error(error);
-        }
+    function didSelectTableViewAction(event){
+        // 
+        console.log(event.detail.tag)
+        $userAction = { action:event.detail.tag }
+        goto("admin/editor?id="+event.detail.tag)
     }
+   
 
 </script>
 
 {#if showAlert}
     <UiAlertComponent on:componentEvent={didSelectComponentCallToAction} />
-    
 {/if}
 
 <div id="general">
     
     <aside id="lateral">
-        <UiCreateUserComponent objectList={pageList} on:componentEvent={didSelectRowAt}
-        
-        />
+        <UiCreateUserComponent objectList={pageList} on:componentEvent={didSelectRowAt}/>
     </aside>
     <section id="content">
-        {#if $pagename.length != 0}
-        <UiUserPageComponent/>    
+        {#if $pageInfo.length != 0}
+        <UiUserPageComponent on:componentEvent={didSelectTableViewAction}/>    
         {/if}
         
     </section>

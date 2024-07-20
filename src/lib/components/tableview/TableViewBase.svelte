@@ -1,27 +1,50 @@
 <script>
     import TableViewCell from "./tableviewcell/TableViewCell.svelte";
-    import { pagename } from "../../stores/auth";
+    import { pageInfo,gptsList } from "../../stores/auth";
+    import { createEventDispatcher } from "svelte";
+        // import { gptsList } from "../stores/auth";
 
-    console.log($pagename)
+
+    const dispatch = createEventDispatcher();
+
+    let list = [0,1,2];
+
+    // console.log($pageInfo)
+    function eventHandler(event){
+        dispatch("componentEvent",event.detail);
+        //  console.log(event.detail)
+    }
 
 </script>
 <div class="tableview-container">
     <div class="tableview-content">
         <div class="top-content">
             <header>
-                <h1>{$pagename.document.pagename}</h1>
-                <p>{$pagename.document.pagelink}</p>
-                <p>{$pagename.document.pagedescription}</p>
+                <h1>{$pageInfo.document.pagename}</h1>
+                <p>{$pageInfo.document.pagelink}</p>
+                <p>{$pageInfo.document.pagedescription}</p>
             </header>
-            <TableViewCell/>
+            <TableViewCell
+             cellname="Create a GPT"
+             cellDetails="Customise a version of ChatGPT for a specific pursose"
+             tag={null}
+             editionMode={true}
+             on:componentEvent={eventHandler}/>
         </div>
+
         <div class="center-content">
-            <TableViewCell/>
-            <TableViewCell/>
-            <TableViewCell/>
-            <TableViewCell/>
-            <TableViewCell/>
-            <TableViewCell/>
+
+            {#each $gptsList as lista,index}
+            <TableViewCell
+            cellname="Create a GPT"
+            cellDetails="Customise a version of ChatGPT for a specific pursose"
+            editionMode={true}
+            tag={index}
+            on:componentEvent={eventHandler}/>
+            {/each}
+
+             
+
 
         </div>
         <div class="bottom-content">c</div>
@@ -41,13 +64,15 @@
     }
 
     .top-content{
-        border-bottom: 1px solid #424242
+        border-bottom: 1px solid #424242;
+
+        /* background-color: red; */
     }
 
     header {
         text-align: center;
         color: white;
         /* background-color: aqua; */
-        /* height: 500px; */
+        /* height: 150px; */
     }
 </style>

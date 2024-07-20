@@ -5,6 +5,7 @@
         GoogleAuthProvider,
         signInWithPopup,
     } from "firebase/auth";
+    import { getCookieInfo } from "../lib/API";
 
     import { onMount } from "svelte";
     import LoginModal from "../lib/components/modal/LoginModal.svelte";
@@ -13,12 +14,24 @@
     let isLoggedIn = null;
 
     onMount(() => {
-        logout()
+        // logout()
+       
         onAuthStateChanged(auth, (authUser) => {
 
             if (authUser) {
-                setTimeout(() => {WellcomeToInstagram(true)}, 1000);
-                //console.log(authUser);
+
+                if(getCookieInfo("uid") != null){
+                    // console.log(getCookieInfo("uid"))
+                    setTimeout(() => {WellcomeToInstagram(true)}, 1000);
+                    // goto("/admin")
+                }else{
+                    // console.log(authUser.uid)
+                    document.cookie = `uid=${authUser.uid}; Path=/; SameSite=Lax`;
+                    document.cookie = `role=${"admin"}; Path=/; SameSite=Lax`;
+                }
+                
+                
+                console.log(authUser);
                 // goto("/admin")
             } else{
                  WellcomeToInstagram(false)

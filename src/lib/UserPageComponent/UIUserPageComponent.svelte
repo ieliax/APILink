@@ -1,17 +1,40 @@
 <script>
+    import { createEventDispatcher } from "svelte";
     import TableViewBase from "../components/tableview/TableViewBase.svelte";
+    import { collectionByName, getCookieInfo } from "../API";
+    import { gptsList,pageInfo } from "../stores/auth";
 
+ 
 
+    const dispatch = createEventDispatcher();
+
+    // init();
+    async function init() {
+        
+        // let response = await collectionByName("gpts/"+getCookieInfo("uid")+"/userGPTS");
+        
+        let response = await collectionByName("gpts/"+$pageInfo.document.pageid+"/userGPTS");
+        //  gptsList.update(gpt => [...gpt,response])
+        
+       
+    }
+    // console.log($pageInfo.document.pageid)
+     $:pageInfo,init()
+    //  console.log($pageInfo.document.pagename);
+
+    function eventHandler(event) {
+        dispatch("componentEvent", event.detail);
+        // console.log(event)
+    }
 </script>
+
 <div class="userpage-container">
     <div class="userpage-content">
         <div class="top-content"></div>
         <div class="center-content">
-            <TableViewBase/>
+            <TableViewBase on:componentEvent={eventHandler} />
         </div>
-        <div class="bottom-content">
-            
-        </div>
+        <div class="bottom-content"></div>
     </div>
 </div>
 
@@ -55,6 +78,4 @@
         /* background-color: red; */
         height: 50px;
     }
-
-    
 </style>
