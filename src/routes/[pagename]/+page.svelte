@@ -341,7 +341,7 @@
         <div class="chatbox__header"></div>
         <div class="chatbox__content">
             {#if $messagelist.length == 0}
-                <!-- <button>vacio</button>  -->
+    
                 <GptInfo
                     gptname={data.pageinfo.nickname}
                     gptlink={"By " + data.pageinfo.biolink}
