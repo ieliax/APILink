@@ -59,7 +59,7 @@ Este enfoque mantiene la interfaz limpia y funcional, al tiempo que garantiza qu
     .messagebox__container {
         display: flex;
         flex-direction: row;
-        background-color: aqua;
+        /* background-color: aqua; */
         gap: 10px;
         /* height: auto; */
         margin-bottom: 20px;
@@ -76,15 +76,19 @@ Este enfoque mantiene la interfaz limpia y funcional, al tiempo que garantiza qu
     .messagebox__container-message {
         /* line-height: 22px; */
         display: flex;
-        background-color: rosybrown;
+        /* background-color: rosybrown; */
         width: 100%;
     }
     .messagebox__container-message textarea {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 16px;
         width: 100%;
         resize: none;
         overflow-y: hidden;
         outline: none;
         border: none;
+        color: #E3E3E3;
+        background-color: transparent;
         /* align-content: center; */
         margin-top: 10px;
         /* padding: 5px; */

@@ -13,7 +13,7 @@
     } from "../../lib/openai";
 
     let chatboxMain;
-    let footerheight = 65; // Inicia con la altura del footer predeterminada
+    let footerheight = 75; // Inicia con la altura del footer predeterminada
     let myTextarea;
     let paddinbottom = 10;
     let previousScrollHeight = 45; // Inicializa con la altura inicial del textarea
@@ -27,7 +27,19 @@
     console.log(data);
 
     onMount(() => {
-        chatboxMain.style.height = `calc(100vh - ${footerheight}px)`;
+        let baseHeight;
+        
+        if(window.innerWidth >= 768){
+            baseHeight = 100;
+        }
+        //else if(window.innerWidth >=389 && window.innerWidth <=394 ){
+        //     baseHeight = 130;
+        // }else if(window.innerWidth >=374 && window.innerWidth <=415 ){
+        //     baseHeight = 130;
+        // }
+        console.log(window.innerHeight)
+        // 100vh en ambos, ajustar si necesario
+        chatboxMain.style.height = `calc(${baseHeight}vh - ${footerheight}px)`;
     });
 
     function isJsonString(str) {
@@ -282,13 +294,13 @@
             lastHeight = currentHeight;
             currentHeight = currentScrollHeight;
             footerheight = Math.max(
-                65,
+                75,
                 myTextarea.scrollHeight + paddinbottom * 2,
             );
             newline = !newline;
         } else if (!myTextarea.value.trim()) {
             // Si no hay texto, restablece la altura del footer a la mínima
-            footerheight = 65;
+            footerheight = 75;
             previousScrollHeight = 45; // Restablecer la altura anterior para evitar desajustes
             lastHeight = 0;
             currentHeight = 43;
@@ -300,13 +312,14 @@
             lastHeight = currentHeight;
             currentHeight = currentScrollHeight;
             console.log("subiendo", currentHeight);
-            footerheight = Math.max(65, currentScrollHeight + paddinbottom * 2);
+            footerheight = Math.max(75, currentScrollHeight + paddinbottom * 3);
         } else if (currentScrollHeight < currentHeight && lastHeight) {
             // console.log("current",currentHeight,"scroll:",currentScrollHeight)
             lastHeight = currentHeight;
             currentHeight = currentScrollHeight;
-            footerheight = Math.max(65, lastHeight);
+            footerheight = Math.max(75, lastHeight);
         }
+        
     }
 
     function updateScroll() {
@@ -332,12 +345,11 @@
     }
 </script>
 
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
 <div class="chatbox">
-    <div
-        class="chatbox__main"
-        bind:this={chatboxMain}
-        style="height: calc(100vh - {footerheight}px);"
-    >
+    <div class="chatbox__main" bind:this={chatboxMain}>
         <div class="chatbox__header"></div>
         <div class="chatbox__content">
             {#if $messagelist.length == 0}
@@ -380,12 +392,14 @@
     }
     .chatbox {
         margin: -8px;
+        background-color: #212121;
+        
     }
 
     .chatbox__header {
         position: sticky;
         top: 0;
-        background-color: blueviolet;
+        background-color: #171717;
         height: 65px;
         /* height: clamp(65px, 100%, 65px); */
     }
@@ -393,9 +407,9 @@
     .chatbox__main {
         display: grid;
         grid-template-rows: 0.1fr auto;
-        background-color: red;
-        /* height: 90vh; */
+        /* background-color: red; */
         overflow-y: auto;
+        /* height: 500%; */
         /* z-index: -1000; */
         /* width: 100%; */
     }
@@ -410,7 +424,7 @@
         /* width: 100%;
         height: 100%; */
 
-        background-color: blue;
+        /* background-color: blue; */
     }
 
     
@@ -420,30 +434,44 @@
         bottom: 0;
         width: 99%;
         justify-content: center;
-        /* height: 165px; */
-        background-color: brown;
+        /* height: 65px; */
+        background-color: #212121;
     }
 
     .chatbox__footer-content {
         display: grid;
         grid-template-rows: auto 0.1fr;
         width: clamp(450px, 100%, 785px);
+        
         /* margin-left: -16px; */
-        background-color: blue;
+        /* background-color: blue; */
         /* margin: 0 auto; */
         /* align-items: center; */
     }
 
     .chatbox__footer-content p {
-        background-color: red;
+        /* background-color: red; */
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 12px;
+        color: #B4B4B4;
         text-align: center;
         height: 20px;
+        margin:5px;
     }
 
     .chatbox__footer-textarea {
         width: clamp(450px, 90%, 785px);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 15px;
         padding: 10px;
+        padding-left: 35px;
+        padding-right: 65px;
         margin: 0 auto;
+        outline: none;
+        border-radius: 50px;
+        border: none;
+
+        background-color: #2F2F2F;
         /* margin-bottom: 10px; */
         bottom: 0;
         /* max-height: 150px; */
@@ -451,4 +479,75 @@
         resize: none;
         line-height: 22px;
     }
+
+   
+    @media (min-width: 360px) {
+        /* .chatbox__footer-content p{
+            color: white;
+        } */
+        .chatbox__main {
+            height: calc(122vh);
+        }
+    }
+
+    /* @media (max-height: 780px) {
+
+        .chatbox__main {
+            height: calc(120vh);
+        }
+    } */
+
+    
+
+    @media (min-width: 375px) {
+        /* .chatbox__footer-content p{
+            color: white;
+        } */
+        .chatbox__main {
+            height: calc(115.5vh);
+        }
+    }
+    
+
+    @media (min-width: 390px) and (max-width: 393px) {
+        /* .chatbox__footer-content p{
+            color: white;
+        } */
+        .chatbox__main {
+            height: calc(111.5vh);
+        }
+    }
+
+
+
+    @media (min-width: 412px){
+
+        .chatbox__main {
+            height: calc(106.5vh);
+        }
+        .chatbox__footer-textarea {
+            /* background-color: red; */
+            width: clamp(0px, 85%, 785px);
+            color: #E3E3E3;
+            /* margin-left: 20px;
+            margin-right: 20px; */
+        }
+        
+    }
+
+     @media (min-width: 414px){
+
+        .chatbox__main {
+            height: calc(105vh);
+        }
+    }
+
+    @media (min-width: 424px){
+
+        .chatbox__main {
+            height: calc(101.5vh);
+        }
+    }
+
+  
 </style>

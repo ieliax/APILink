@@ -5,6 +5,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, setDoc,addDoc, getDoc,getDocs, increment,collection  } from "firebase/firestore";
 import { getStorage} from "firebase/storage";
+//authDomain: "apilink-55977.firebaseapp.com",
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 

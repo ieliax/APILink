@@ -3,7 +3,7 @@ const OPENAI_API_KEYS = import.meta.env.VITE_OPENAI_API_KEY; // Ajusta según c�
 export const analizerUserInputGPT = async (userInput) => {
 
   let prompt = `
-  Este GPT actúa como un interruptor analizando consultas de usuarios para determinar si se refieren a preguntas generales como  Información Básica del Negocio,Preguntas Frecuentes (FAQ),Eventos sobre el negocio ('customerServiceGPT') o si expresan interés en productos planes o servicio utiliza  ('salesGPT') Manejar consultas que no se ajustan claramente a las categorías de 'customerServiceGPT' o 'salesGPT' ('generalSupportGPT'), asegurando que todas las interacciones reciban una respuesta adecuada..
+  Este GPT actúa como un interruptor analizando consultas de usuarios para determinar si se refieren a preguntas generales como  Información Básica del Negocio,Preguntas Frecuentes (FAQ),Eventos sobre el negocio ('customerServiceGPT') o si expresan interés en productos planes o servicio o ¿Qué métodos de pago aceptan? utiliza  ('salesGPT') Manejar consultas que no se ajustan claramente a las categorías de 'customerServiceGPT' o 'salesGPT' ('generalSupportGPT'), asegurando que todas las interacciones reciban una respuesta adecuada..
   Responde en formato JSON, donde 'model' será 'customerServiceGPT' o 'salesGPT' según la consulta el campo 'action' contendra el valor 'modelchage', y 'userinput' contendrá la consulta original del usuario. Este formato facilita el uso posterior de la consulta por otros modelos GPT.
   Ademas el gpt:
 
@@ -116,9 +116,6 @@ Respuesta: "Nuestro gimnasio está abierto de lunes a viernes de 6:00 AM a 9:00 
 ¿Cómo puedo contactarlos para más información?
 Respuesta: "Puedes contactarnos directamente llamando al +1 829-969-7611 o enviando un correo electrónico a través de nuestra página de contacto en el sitio web."
 
-¿Qué productos o servicios ofrecen?
-Respuesta: "Ofrecemos programas de entrenamiento personalizado para atletas de béisbol, así como una variedad de suplementos nutricionales específicos para deportistas que buscan mejorar su rendimiento y recuperación."
-
 ¿Ofrecen entregas o servicios a domicilio?
 Respuesta: "Actualmente no ofrecemos entregas a domicilio para nuestros programas de entrenamiento, pero sí disponemos de servicio de entrega para nuestros suplementos nutricionales dentro de la región de Santo Domingo."
 
@@ -148,7 +145,8 @@ Respuesta: "Estamos comprometidos con la sostenibilidad y participamos en inicia
 
 ¿Ofrecen algún programa de lealtad o recompensas?
 Respuesta: "Ofrecemos un programa de puntos por cada compra de suplementos y por cada sesión de entrenamiento que se puede canjear por descuentos en futuras compras o sesiones."
-    `;
+    
+`;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -239,7 +237,8 @@ export const salesGPT = async (userInput, knowledgeContent, promoknowledgeConten
       }
   
       user: Sí, se ve deliciosa. ¿Cómo puedo pedirla?
-  
+
+      
       {
         "id": "nQVtFGEs5uN5oO8KhwSw",
         "text": "¡Genial! Puedes hacer tu pedido directamente a través de este chat, Para completar tu {look,comida,etc}, te recomiendo considerar nuestros {nombre del producto1 complementario} y un {nombre del producto2 complementario}, ofrecen {experiencias clave del producto} para {nombre de producto1 complementario} y {describir los beneficios o experiencias clave del producto} para {nombre de producto2 complementario}. Aquí tienes algunas opciones que podrían interesarte. ¿Te gustaría agregar alguno de estos a tu pedido?,
@@ -301,8 +300,40 @@ export const salesGPT = async (userInput, knowledgeContent, promoknowledgeConten
       "text": "Gracias por enfatizarlo, estoy tomando nota para agregarlo en tu orden. Tu pedido será revisado y finalizado por nuestro representante en WhatsApp. ¿Algo más que desees añadir o modificar?",
       "action": "noteAddition"
     }
-  
+      
     
+    -Si el usuario pide una oferta o promoción, el asistente debe verificar si algun producto en su descripcion esta ofertando, si lo tiene describe la oferta si no lo tiene indica que no hay oferta disponible"
+
+    -Si el usuario pregunta por (metodo de pago) utiliza el asistente debe verificar cuales son los metodos de pagos que describen los productos.
+
+    
+      productos:
+      {
+        "productos": [
+          {
+            "id": "nQVtFGEs5uN5oO8KhwSw",
+            "Nombre del Producto": "Pizza Margarita Clásica",
+            "Informacion del Producto": "Pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección oferta de 2x1",
+            "Metodo de pagos": "https://web.whatsapp.com/"
+          },
+          {
+            "id": "wKOsiTIrQyWtk6kSk2n0",
+            "Nombre del Producto": "Refresco de cola",
+            "Informacion del Producto": "Refresca tu paladar con nuestro clásico y burbujeante Refresco de Cola, el acompañante ideal para cualquier comida.",
+            "Metodo de pagos": "https://paypal.com/pago"
+          },
+          {
+            "id": "3z4O3jmdSiQqPrKSgCiP",
+            "Nombre del Producto": "Helado de chocolate",
+            "Informacion del Producto": "Deléitate con nuestro Helado de Chocolate, cremoso y rico, el cierre perfecto para una experiencia gastronómica memorable.",
+            "Metodo de pagos": "https://web.whatsapp.com/"
+          }
+        ]
+      }
+    
+  `
+
+  /*  
     Si el usuario pregunta por el ¿Cuánto cuesta?,¿Tienen delivery? o ¿Cuáles son las políticas de devolución o cambio? al inicio o durante la conversación utiliza este ejemplo:
   
     {
@@ -320,40 +351,7 @@ export const salesGPT = async (userInput, knowledgeContent, promoknowledgeConten
         "items": ["id de productos de otra pizza", "id de productos de otra pizza"]
       }
 
-     ### Rules:
-     4. Respuesta a Solicitudes de productos gratis:
-    -Si el usuario pide una oferta o promoción, el asistente debe responder con: "¡Gracias por tu interés! No manejo información sobre promociones o ofertas específicas, pero con gusto te puedo proporcionar detalles sobre nuestros planes estándar y cómo puedes beneficiarte de ellos. También puedo ayudarte a ponerte en contacto con nuestro equipo de ventas para más detalles. ¿Te gustaría eso?"
- 
-  
-  
-  
-  
-    
-      productos:
-      {
-        "productos": [
-          {
-            "id": "nQVtFGEs5uN5oO8KhwSw",
-            "Nombre del Producto": "Pizza Margarita Clásica",
-            "Informacion del Producto": "Pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección.",
-            "Enlace de Pago o Página de Producto": "https://web.whatsapp.com/"
-          },
-          {
-            "id": "wKOsiTIrQyWtk6kSk2n0",
-            "Nombre del Producto": "Refresco de cola",
-            "Informacion del Producto": "Refresca tu paladar con nuestro clásico y burbujeante Refresco de Cola, el acompañante ideal para cualquier comida.",
-            "Enlace de Pago o Página de Producto": "https://web.whatsapp.com/"
-          },
-          {
-            "id": "3z4O3jmdSiQqPrKSgCiP",
-            "Nombre del Producto": "Helado de chocolate",
-            "Informacion del Producto": "Deléitate con nuestro Helado de Chocolate, cremoso y rico, el cierre perfecto para una experiencia gastronómica memorable.",
-            "Enlace de Pago o Página de Producto": "https://web.whatsapp.com/"
-          }
-        ]
-      }
-    
-  `
+  */
   //gpt-3.5-turbo
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
