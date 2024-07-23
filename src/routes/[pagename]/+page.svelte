@@ -30,7 +30,7 @@
         let baseHeight;
         
         if(window.innerWidth >= 768){
-            baseHeight = 100;
+            // baseHeight = 100;
         }
         //else if(window.innerWidth >=389 && window.innerWidth <=394 ){
         //     baseHeight = 130;
@@ -486,7 +486,7 @@
             color: white;
         } */
         .chatbox__main {
-            height: calc(122vh);
+            height: calc(90vh);
         }
     }
 
