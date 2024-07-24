@@ -32,8 +32,9 @@
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
 
+        setVH();
         // Ejecuta la función al cargar la página
-        window.addEventListener('load', setVH);
+        window.addEventListener('resize', setVH);
 
         // Asegúrate de actualizar la altura cuando se cambie el tamaño de la ventana
         window.addEventListener('resize', setVH);
