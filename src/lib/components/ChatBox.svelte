@@ -67,8 +67,10 @@
     max-width: 600px;
     height: calc(var(--vh, 1vh) * 100); /* Usa 100 veces el valor de --vh */
     /* height: calc(100vh - 20px); */
-    margin: auto;
+    /* margin: auto; */
+    margin: -8px;
     border: 1px solid #ae2626;
+    background-color: red;
     padding: 10px;
 }
 .messages {
