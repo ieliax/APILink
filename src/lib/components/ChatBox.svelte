@@ -42,17 +42,19 @@
 </script>
 
 <div class="chatbox" bind:this={chatboxMain}>
-    <div class="messages">
-        {#each messages as message}
-            <div class={`message ${message.role}`}>
-                {message.text}
-            </div>
-        {/each}
-    </div>
-    <div class="input-area">
-        <textarea bind:this={textarea} class="textarea" on:input={autoResize}></textarea>
-        <button on:click={sendMessage}>Send</button>
-    </div>
+    <div class="chatbox__content">
+        <div class="messages">
+            {#each messages as message}
+                <div class={`message ${message.role}`}>
+                    {message.text}
+                </div>
+            {/each}
+        </div>
+        <div class="input-area">
+            <textarea bind:this={textarea} class="textarea" on:input={autoResize}></textarea>
+            <button on:click={sendMessage}>Send</button>
+        </div>
+    </div> 
 </div>
 
 <style>
@@ -63,17 +65,31 @@
     box-sizing: border-box;
 }
 .chatbox {
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* max-width: 600px; */
+    /* height: calc(var(--vh, 1vh) * 100); */
+    background-color: black;
+    /* height: calc(100vh - 20px); */
+    /* margin: 0 auto; */
+    margin: -8px;
+
+}
+
+.chatbox__content{
     display: flex;
     flex-direction: column;
     max-width: 600px;
     height: calc(var(--vh, 1vh) * 100); /* Usa 100 veces el valor de --vh */
     /* height: calc(100vh - 20px); */
-    /* margin: auto; */
-    margin: -8px;
+    margin: 0 auto;
+    /* margin: -8px; */
+
     border: 1px solid #ae2626;
     background-color: red;
     padding: 10px;
 }
+
 .messages {
     flex-grow: 1;
     overflow-y: auto;
