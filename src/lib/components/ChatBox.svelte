@@ -25,6 +25,19 @@
     function handleKeydown(){
 
     }
+
+    onMount(() => {
+        function setVH() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        // Ejecuta la función al cargar la página
+        window.addEventListener('load', setVH);
+
+        // Asegúrate de actualizar la altura cuando se cambie el tamaño de la ventana
+        window.addEventListener('resize', setVH);
+    });
 </script>
 
 <div class="chatbox" bind:this={chatboxMain}>
@@ -52,9 +65,10 @@
     display: flex;
     flex-direction: column;
     max-width: 600px;
-    height: calc(100vh - 20px);
+    height: calc(var(--vh, 1vh) * 100); /* Usa 100 veces el valor de --vh */
+    /* height: calc(100vh - 20px); */
     margin: auto;
-    border: 1px solid #ccc;
+    border: 1px solid #ae2626;
     padding: 10px;
 }
 .messages {
