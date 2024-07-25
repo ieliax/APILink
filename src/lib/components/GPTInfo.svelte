@@ -35,7 +35,7 @@
         /* width: 100%; */
     
         height: 305px;
-        margin-top: 125px;
+        margin-top: 175px;
         background-color: #212121;
         align-items: center;
         gap: 11px;

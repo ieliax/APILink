@@ -1,21 +1,30 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount,tick  } from "svelte";
+    import GptMessagebox from "./GPTMessagebox.svelte";
     let chatboxMain;
     let textarea;
     let messages = []; // Esto almacenará los mensajes del chat
 
     // Función para agregar mensajes al chat
-    function sendMessage() {
+    async function sendMessage() {
         const message = textarea.value.trim();
+        
         if (message) {
             messages = [...messages, { text: message, role: "user" }];
             textarea.value = ""; // Limpia el textarea después de enviar
-            // Simulando respuesta del servidor
-            setTimeout(() => {
+            textarea.style.height = 50+"px"
+            await tick();
+            scrollToBottom() 
+
+            // textarea.style.overflowY = "hidden";
+        
+            setTimeout(async () => {
                 messages = [
                     ...messages,
                     { text: "¡Respuesta automática!", role: "assistant" },
                 ];
+                await tick(); // Espera a que Svelte actualice el DOM
+                scrollToBottom(); // Llama a la función que ajusta el scroll
             }, 1000);
         }
     }
@@ -33,15 +42,19 @@
 
         // Ajusta la altura solo si el scrollHeight es mayor que clientHeight
 
+        
         if (scrollHeight > clientHeight) {
             textarea.style.height = scrollHeight + "px"; // Ajusta a la altura del contenido
             if (scrollHeight > 150) {
                 console.log("todo limpio")
                 textarea.style.overflowY = "auto"; // Activa la barra de desplazamiento
+                // scrollToBottom()
+            }else{
+                scrollToBottom();
             }
         }else if (!textarea.value.trim()) {
-            console.log("todo limpio")
-            textarea.style.height = 'auto'
+            console.log("todo limpio22")
+            // textarea.style.height = 'auto'
             textarea.style.height = 50+"px"
             textarea.style.overflowY = "hidden";
         }
@@ -61,37 +74,41 @@
         window.addEventListener("resize", setVH);
     });
 
-    function updateScroll() {
-        requestAnimationFrame(() => {
-            textarea.scrollTop = textarea.scrollHeight;
-        });
+    function scrollToBottom() {
+        
+        chatboxMain.scrollTop = chatboxMain.scrollHeight; // Ajusta el scroll al fondo
+        console.log(chatboxMain.scrollTop)
     }
+
     function handleKeydown(event) {
         // console.log("assss")
         if (event.key === "Enter") {
             if (!event.shiftKey) {
                 event.preventDefault(); // Previene la inserción de un salto de línea
                 sendMessage();
+                
             } else {
                 // Aquí, simplemente permites que el salto de línea ocurra, no necesitas hacer nada especial.
                 if (textarea.value.trim() === "") {
                     event.preventDefault(); // Si no hay texto, también previene el salto de línea con Shift+Enter
                     console.log("no hay texto");
                 } else {
-                    updateScroll();
+                    // updateScroll();
+                    console.log("Asssss") 
                 }
             }
         }
     }
 </script>
 
-<div class="chatbox" bind:this={chatboxMain}>
-    <div class="chatbox__content">
-        <div class="messages">
+<div class="chatbox" >
+    <div class="chatbox__content" >
+        <div class="messages" bind:this={chatboxMain}>
             {#each messages as message}
-                <div class={`message ${message.role}`}>
+                <!-- <div class={`message ${message.role}`}>
                     {message.text}
-                </div>
+                </div> -->
+                <GptMessagebox role={message.role} message={message.text}/>
             {/each}
         </div>
         <div class="input-area">
@@ -133,18 +150,24 @@
         border: 1px solid #ae2626;
         background-color: red;
         padding: 10px;
+        
     }
 
     .messages {
         flex-grow: 1;
         overflow-y: auto;
+        padding: 10px; 
     }
     .message {
         margin: 5px;
         padding: 10px;
         background-color: #f4f4f4;
         border-radius: 8px;
-    }
+        overflow-wrap: break-word; 
+        word-wrap: break-word; 
+        word-break: break-word; 
+        max-width: 100%; 
+        }
     .user {
         align-self: flex-end;
         background-color: #dcf8c6;

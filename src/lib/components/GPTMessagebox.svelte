@@ -90,7 +90,9 @@ Este enfoque mantiene la interfaz limpia y funcional, al tiempo que garantiza qu
         color: #E3E3E3;
         background-color: transparent;
         /* align-content: center; */
-        margin-top: 10px;
+        margin-top: 0px;
+        line-height: 25px;
+        /* line-height: 25px; */
         /* padding: 5px; */
         /* box-sizing: border-box; */
         /* padding: 10px; */
