@@ -94,7 +94,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         padding: 10px;
     }
     .item {
-        flex: 0 0 60%;
+        flex: 0 0 100%;
         scroll-snap-align: start;
         position: relative;
     }
@@ -102,7 +102,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         width: 100%;
         height: 100%;
         display: block;
-        border-radius: 10px;
+        border-radius: 5px;
     }
     .buttonSection{
         /* display: flex; */

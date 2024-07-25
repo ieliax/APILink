@@ -14,7 +14,7 @@ export const gptanalizer = writable(`
 export const openaiList = writable(`
     {
         "id":"assistant",
-        "text":"",
+        "text":"¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1. Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarella y una Ensalada César. ",
         "action":"crossSell",
         "items": [
         {

@@ -37,7 +37,7 @@
                     console.log(response.items);
                     setTimeout(async () => {
                         // messages = [...messages,{text: "¡Respuesta automática!",role: "assistant"}];
-                        messagelist.update((m) => [...m,{role: "assistant", text:response.id, model:analizeResponse.model, itemList:response.items}]);
+                        messagelist.update((m) => [...m,{role: "assistant", text:response.text, model:analizeResponse.model, itemList:response.items}]);
                         await tick(); // Espera a que Svelte actualice el DOM
                         scrollToBottom(); // Llama a la función que ajusta el scroll
                     }, 1000);
