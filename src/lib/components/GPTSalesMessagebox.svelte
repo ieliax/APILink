@@ -11,6 +11,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
 
     export let role;
     export let crossell;
+    let container;
 
     
     // Mytextarea.scrollTop = Mytextarea.scrollHeight;
@@ -41,9 +42,13 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         <img src={imageurl} alt="" />
         <div class="messagebox__container-message" >
             <textarea name="" bind:this={myTextarea}>{message}</textarea>
-            <div class="crossell">
-                <img src="https://scontent-lga3-1.xx.fbcdn.net/v/t39.30808-6/452605479_905987121556186_7337387986837180284_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=15UIPwWkCxQQ7kNvgH1VW3D&_nc_ht=scontent-lga3-1.xx&oh=00_AYBxMty7CSnCEjHoOewPdVpPRqLdAJNkcuomw5ts59aksw&oe=66A87BFA" alt="">
-                <img src="https://scontent-lga3-1.xx.fbcdn.net/v/t39.30808-6/452605479_905987121556186_7337387986837180284_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=15UIPwWkCxQQ7kNvgH1VW3D&_nc_ht=scontent-lga3-1.xx&oh=00_AYBxMty7CSnCEjHoOewPdVpPRqLdAJNkcuomw5ts59aksw&oe=66A87BFA" alt="">
+            <div class="cross-sell-container" bind:this={container}>
+                {#each crossell as item }
+                    <div class="item">
+                        <img src="https://scontent-lga3-1.xx.fbcdn.net/v/t39.30808-6/452605479_905987121556186_7337387986837180284_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=15UIPwWkCxQQ7kNvgH1VW3D&_nc_ht=scontent-lga3-1.xx&oh=00_AYBxMty7CSnCEjHoOewPdVpPRqLdAJNkcuomw5ts59aksw&oe=66A87BFA" alt="">
+                <!-- <img src="https://scontent-lga3-1.xx.fbcdn.net/v/t39.30808-6/452605479_905987121556186_7337387986837180284_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=15UIPwWkCxQQ7kNvgH1VW3D&_nc_ht=scontent-lga3-1.xx&oh=00_AYBxMty7CSnCEjHoOewPdVpPRqLdAJNkcuomw5ts59aksw&oe=66A87BFA" alt=""> -->
+                    </div>
+                {/each}
             </div>
             <div class="buttonSection">
                 <button>Agregar Productos</button>
@@ -81,17 +86,23 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         /* background-color: rosybrown; */
         width: 100%;
     }
-    .crossell{
+    .cross-sell-container {
         display: flex;
-        width: 500px;
-        gap: 10px;
-        margin-bottom: 10px;
-        flex-direction: row;
         overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 10px;
+        padding: 10px;
     }
-    .crossell img{
-        width: 400px;    
-        height: 400px; 
+    .item {
+        flex: 0 0 60%;
+        scroll-snap-align: start;
+        position: relative;
+    }
+    .cross-sell-container img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 10px;
     }
     .buttonSection{
         /* display: flex; */
