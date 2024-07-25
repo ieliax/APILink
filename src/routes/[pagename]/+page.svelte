@@ -5,7 +5,12 @@
     let chatboxMain;
     let textarea;
     let messages = []; // Esto almacenará los mensajes del chat
-    import { messagelist } from "../../lib/stores/auth";
+    import {
+        messagelist,
+        openaiList,
+        gptanalizer,
+    } from "../../lib/stores/auth";
+    import GptSalesMessagebox from "../../lib/components/GPTSalesMessagebox.svelte";
 
     export let data;
 
@@ -14,24 +19,34 @@
         const message = textarea.value.trim();
 
         if (message) {
-            messagelist.update((m) => [...m,{ role: "user", content: textarea.value }]);
+            messagelist.update((m) => [
+                ...m,
+                { role: "user", content: textarea.value },
+            ]);
             // messages = [...messages, { text: message, role: "user" }];
             textarea.value = ""; // Limpia el textarea después de enviar
             textarea.style.height = 50 + "px";
             await tick();
             scrollToBottom();
 
-            // textarea.style.overflowY = "hidden";
+            let analizeResponse = JSON.parse($gptanalizer);
 
-            setTimeout(async () => {
-                messages = [
-                    ...messages,
-                    { text: "¡Respuesta automática!", role: "assistant" },
-                ];
-                messagelist.update((m) => [...m,{ role: "assistant", content: "¡Respuesta automática!"}]);
-                await tick(); // Espera a que Svelte actualice el DOM
-                scrollToBottom(); // Llama a la función que ajusta el scroll
-            }, 1000);
+            if (analizeResponse.action === "modelchange") {
+                if (analizeResponse.model == "salesGPT") {
+                    let response = JSON.parse($openaiList);
+                    console.log(response.items);
+                    setTimeout(async () => {
+                        // messages = [...messages,{text: "¡Respuesta automática!",role: "assistant"}];
+                        messagelist.update((m) => [...m,{role: "assistant", text:response.id, model:analizeResponse.model, itemList:response.items}]);
+                        await tick(); // Espera a que Svelte actualice el DOM
+                        scrollToBottom(); // Llama a la función que ajusta el scroll
+                    }, 1000);
+                }
+            } else {
+                //...
+            }
+
+            // textarea.style.overflowY = "hidden";
         }
     }
 
@@ -114,12 +129,15 @@
                     gptdescription={data.pageinfo.bio}
                 />
             {:else}
-                {#each $messagelist as l}
-                    {#if l.role == "assistant"}
-                        <GptMessagebox role={l.role} message={l.content} />
-                    {:else if l.role == "user"}
+                {#each $messagelist as message}
+                    {#if message.role == "assistant"}
+                        {#if message.model == "salesGPT"}
+                            <GptSalesMessagebox role={message.role} message={message.text} crossell={message.itemList} />    
+                        {/if}
+                        
+                    {:else if message.role == "user"}
                         <!-- {l.content} -->
-                        <GptMessagebox role={l.role} message={l.content} />
+                        <GptMessagebox role={message.role} message={message.content} />
                     {/if}
                 {/each}
             {/if}
@@ -136,7 +154,8 @@
                 class="textarea"
                 on:input={autoResize}
                 on:keydown={handleKeydown}
-                placeholder="Message ChatGPT"></textarea>
+                placeholder="Message ChatGPT"
+            ></textarea>
             <button on:click={sendMessage}>Send</button>
         </div>
         <!-- <div class="input-grid">
@@ -153,7 +172,7 @@
         box-sizing: border-box;
     }
     .chatbox {
-        background-color:#212121;
+        background-color: #212121;
         margin: -8px;
     }
 
@@ -174,7 +193,8 @@
     .messages {
         flex-grow: 1;
         overflow-y: auto;
-        padding: 10px;
+        /* padding: 10px; */
+        /* background-color: red; */
     }
     .message {
         margin: 5px;
@@ -201,7 +221,7 @@
         /* flex-direction: row; */
         border-radius: 50px;
         flex-shrink: 0;
-        background-color: #2F2F2F;
+        background-color: #2f2f2f;
         padding: 5px;
         margin-top: 10px;
     }
@@ -231,8 +251,8 @@
         outline: none;
         background-color: transparent;
         border: none;
-        color: #ECECEC;
-        
+        color: #ececec;
+
         /* max-height: 150px;
     min-height: 50px; */
         /* border: 1px solid #ccc; */

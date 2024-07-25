@@ -17,6 +17,8 @@
             scrollToBottom() 
 
             // textarea.style.overflowY = "hidden";
+            
+     
         
             setTimeout(async () => {
                 messages = [
