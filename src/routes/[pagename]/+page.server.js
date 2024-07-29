@@ -3,12 +3,12 @@ import { commonLoad } from '../../lib/utils/commonLoad.js';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ params, request }) => {
-    // const { cookieState } = await commonLoad({ request })
+    const { cookieState } = await commonLoad({ request })
     // console.log(params)
-
+   
     // const url = new URL(request.url);
     // console.log(url.searchParams.get("main"))
-    // console.log(cookieState)
+    //  console.log(cookieState)
 
 
 
@@ -42,13 +42,15 @@ export const load = async ({ params, request }) => {
         //     gpt = await getBusinessGPTByName(pageid, gptname);
         //     // console.log(gpt)
         // }
-
+        // console.log(cookieState.cookie.uid)
+        
         return {
             pageinfo: {
                 nickname:page[0].document.nickname,
                 bio:page[0].document.pagedescription,
                 biolink:page[0].document.pagelink,
-                baseknowledge:knowledgeContent
+                baseknowledge:knowledgeContent,
+                uid:cookieState.cookie.uid
             }
         }
 

@@ -1,12 +1,50 @@
-import { writable } from "svelte/store";
+import { writable,get  } from "svelte/store";
 import { db, auth,storage } from "$lib/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { serverTimestamp,doc, setDoc, addDoc, getDoc, getDocs, collection, query, orderBy,where } from "firebase/firestore";
+import { serverTimestamp,doc, setDoc, addDoc, getDoc, getDocs, collection, query, orderBy,where,startAfter,limit } from "firebase/firestore";
 import { uploadBytes,getDownloadURL,ref} from "firebase/storage";
 import { description } from "./stores/adminStore";
 
 
+export const userid = writable('');
 
+
+export async function loadMoreProducts(lastVisible, userID) {
+    const productsRef = collection(db, `products/${userID}/userProducts`);
+    let queryRef;
+
+    // Establece el límite de documentos a recuperar en cada solicitud
+    const LIMIT = 1;
+
+    if (lastVisible) {
+      // Si hay un documento visible de la última carga, empieza después de ese documento
+      queryRef = query(productsRef, orderBy("campoOrdenar"), startAfter(lastVisible), limit(LIMIT));
+    } else {
+      // Si no hay un documento visible (primera carga), simplemente aplica el límite
+      queryRef = query(productsRef, orderBy("campoOrdenar"), limit(LIMIT));
+    }
+
+    try {
+      const documentSnapshots = await getDocs(queryRef);
+
+      // Si no hay documentos, has llegado al final de la colección
+      if (documentSnapshots.empty) {
+        console.log("No more documents available.");
+        return { products: [], lastVisible: null };
+      }
+
+      const lastVisibleDocument = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+      const products = documentSnapshots.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Devuelve los productos y el último documento visible si aún hay documentos
+      return { products, lastVisible: lastVisibleDocument };
+    } catch (error) {
+      console.error("Error cargando más productos: ", error);
+      return { products: [], lastVisible: null };
+    }
+  }
+
+  
 
 export function getCookieInfo(name) {
     let cookieArr = document.cookie.split(";");

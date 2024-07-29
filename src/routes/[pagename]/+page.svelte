@@ -1,5 +1,6 @@
 <script>
     import { onMount, tick } from "svelte";
+    import { userid } from "../../lib/API";
     import GptMessagebox from "../../lib/components/GPTMessagebox.svelte";
     import GptInfo from "../../lib/components/GPTInfo.svelte";
     let chatboxMain;
@@ -9,11 +10,15 @@
         messagelist,
         openaiList,
         gptanalizer,
+        pageInfo,
     } from "../../lib/stores/auth";
     import GptSalesMessagebox from "../../lib/components/GPTSalesMessagebox.svelte";
 
     export let data;
 
+    userid.set(data.pageinfo.uid)
+
+    
     // Función para agregar mensajes al chat
     async function sendMessage() {
         const message = textarea.value.trim();
@@ -81,6 +86,7 @@
     }
 
     onMount(() => {
+        // console.log(data.pageInfo.uid)
         function setVH() {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty("--vh", `${vh}px`);
@@ -127,6 +133,7 @@
                     gptname={data.pageinfo.nickname}
                     gptlink={"By " + data.pageinfo.biolink}
                     gptdescription={data.pageinfo.bio}
+                    
                 />
             {:else}
                 {#each $messagelist as message}
