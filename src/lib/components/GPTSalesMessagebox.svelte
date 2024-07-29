@@ -91,6 +91,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         flex-direction: row;
         /* background-color: aqua; */
         gap: 10px;
+        width: 80%;
         /* height: auto; */
         margin-bottom: 20px;
         margin: 10px;
@@ -112,12 +113,12 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
     .cross-sell-container {
         display: flex;
         /* width: 100%; */
-        /* background-color: #2F2F2F; */
+        background-color: #b60707;
         border-radius: 10px;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         gap: 10px;
-        padding: 10px;
+        /* padding: 10px; */
         
     }
     
@@ -241,10 +242,11 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         outline: none;
         border: none;
         color: #e3e3e3;
-        background-color: transparent;
+        background-color: rebeccapurple;
         /* align-content: center; */
         margin-top: 0px;
         line-height: 25px;
+        overflow-y: auto;
         /* line-height: 25px; */
         /* padding: 5px; */
         /* box-sizing: border-box; */

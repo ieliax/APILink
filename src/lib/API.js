@@ -10,7 +10,8 @@ export const userid = writable('');
 
 
 export async function loadMoreProducts(lastVisible, userID) {
-    const productsRef = collection(db, `products/${userID}/userProducts`);
+    const productsRef = collection(db, "products/"+userID+"/userProducts");
+    // console.log(productsRef)
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud

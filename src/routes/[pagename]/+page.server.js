@@ -23,10 +23,11 @@ export const load = async ({ params, request }) => {
         const pageid = page[0].document.pageid;
         let gpt;
         let knowledgeContent;
-
+        console.log(page)
         // if (gptname == null) {
             // gpt = await getBusinessGPTByName(pageid, "clientservices");
 
+            
             const knowledgeURL = page[0].document.baseknowledgeURL;
             const knowledgeResponse = await fetch(knowledgeURL);
 
@@ -36,7 +37,7 @@ export const load = async ({ params, request }) => {
 
             knowledgeContent = await knowledgeResponse.text();
 
-            console.log(page)
+            
 
         // } else {
         //     gpt = await getBusinessGPTByName(pageid, gptname);

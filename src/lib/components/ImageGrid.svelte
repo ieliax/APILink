@@ -10,7 +10,7 @@
         
         products = initialProducts;
         lastVisible = newLastVisible;
-        console.log(products)
+        // console.log(products)
   });
   
   async function handleLoadMore() {
