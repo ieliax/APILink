@@ -1,5 +1,7 @@
 <script>
     import { onMount, onDestroy } from "svelte";
+    import { serverTimestamp } from "firebase/firestore";
+    import { uploadImage, userid, createProduct} from "../API";
 
     export let message = `¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1.
 
@@ -11,14 +13,12 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
 
     export let role;
     export let crossell;
+    let fileInput;
     let container;
+    let imageUrl = "imageplaceholder.jpg";
+    let resizedImageBlob;
 
     // Mytextarea.scrollTop = Mytextarea.scrollHeight;
-    onMount(() => {
-        // window.addEventListener('resize', adjustTextareaHeight);
-        adjustTextareaHeight();
-        console.log(window.innerWidth);
-    });
 
     function adjustTextareaHeight() {
         // Establecer altura automáticamente basada en el contenido
@@ -29,9 +29,124 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         }
     }
 
+    console.log($userid);
+    onMount(() => {
+        // window.addEventListener('resize', adjustTextareaHeight);
+        adjustTextareaHeight();
+        console.log(window.innerWidth);
+        fileInput.addEventListener("change", handleFileChange);
+    });
+
     onDestroy(() => {
+        if (imageUrl) {
+            URL.revokeObjectURL(imageUrl);
+        }
+        fileInput.removeEventListener("change", handleFileChange);
         // window.removeEventListener('resize', adjustTextareaHeight); // Limpiar el listener al destruir el componente
     });
+
+    function upload() {
+        fileInput.click(); // Abre el diálogo de selección de archivo
+    }
+
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            // Revoca la URL anterior si existe
+            if (imageUrl) {
+                URL.revokeObjectURL(imageUrl);
+            }
+
+            // Crea un objeto de imagen para verificar las dimensiones
+            const img = new Image();
+            img.onload = () => {
+                // Calcula la relación de aspecto
+                const aspectRatio = img.width / img.height;
+
+                const file = event.target.files[0];
+                if (file) {
+                    resizeImage(file, 1080, 1080, (blob) => {
+                        if (imageUrl) {
+                            URL.revokeObjectURL(imageUrl);
+                        }
+                        resizedImageBlob = blob;
+                        imageUrl = URL.createObjectURL(blob);
+                    });
+                }
+            };
+            img.onerror = () => {
+                alert("No se pudo cargar la imagen.");
+            };
+            img.src = URL.createObjectURL(file);
+        }
+    }
+
+    function resizeImage(file, maxWidth, maxHeight, callback) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+                const canvas = document.createElement("canvas");
+                let width = img.width;
+                let height = img.height;
+
+                // Ajustar la imagen a la proporción deseada
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(
+                    function (blob) {
+                        callback(blob);
+                    },
+                    "image/jpeg",
+                    0.85,
+                ); // Ajusta la calidad de la imagen aquí, 0.85 es típicamente bueno
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function uploadImageToFirebase() {
+        if (!resizedImageBlob) {
+            console.error("No hay imagen redimensionada para subir.");
+            return;
+        }
+
+        const uid = $userid;
+        const filenamePrefix = "resized-image";
+        const timestamp = new Date().getTime();
+        uploadImage(uid, filenamePrefix + timestamp, resizedImageBlob)
+            .then((downloadURL) => {
+                console.log("Imagen subida con éxito:", downloadURL);
+
+                const objectProduct = {
+                    name: "NEW GPT",
+                    description: "DETALLADO",
+                    image:downloadURL,
+                    campoOrdenar:"4",
+                    timestamp: serverTimestamp(),
+                };
+                createProduct(`products/${$userid}/userProducts`,objectProduct);
+            })
+            .catch((error) => {
+                console.error("Error al subir la imagen:", error);
+            });
+    }
 </script>
 
 <div class="messagebox">
@@ -39,40 +154,53 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         {#if role == "assistant"}
             <img src={imageurl} alt="" />
             <div class="messagebox__container-message">
-                
                 <div class="cross-sell-container" bind:this={container}>
                     {#each crossell as item}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <div class="item">
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                             <img
-                                src="https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/453143659_910517551103143_4910037166660709449_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=qMlqAzI7QikQ7kNvgECgADZ&_nc_ht=scontent.fhex4-1.fna&gid=AHIfq8mhAZzSs1TeorqdTaM&oh=00_AYBrK0J5Y3ykuNHMJZ1WriNYX7jccYZaz9XCu46zJJWTfQ&oe=66AFFD26"
+                                src={imageUrl}
                                 alt=""
+                                on:click={upload}
+                                on:change={handleFileChange}
                             />
-                            <div class="image-info">
+                            <input
+                                type="file"
+                                bind:this={fileInput}
+                                class="hidden"
+                                onchange={handleFileChange}
+                                accept="image/*"
+                            />
+                            <!-- <div class="image-info">
                                 <p>{item.productName}</p>
                                 <button>Agregar</button>
-                            </div>
+                            </div> -->
 
                             <!-- <img src="https://scontent-lga3-1.xx.fbcdn.net/v/t39.30808-6/452605479_905987121556186_7337387986837180284_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=15UIPwWkCxQQ7kNvgH1VW3D&_nc_ht=scontent-lga3-1.xx&oh=00_AYBxMty7CSnCEjHoOewPdVpPRqLdAJNkcuomw5ts59aksw&oe=66A87BFA" alt=""> -->
                         </div>
-                        
                     {/each}
                 </div>
-                <textarea name="" bind:this={myTextarea}>{message}</textarea>
+                <textarea
+                    name=""
+                    bind:this={myTextarea}
+                    on:input={adjustTextareaHeight}
+                    placeholder="¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1. Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarella y una Ensalad"
+                    >{message}</textarea
+                >
                 <div class="buttonSection">
                     <!-- <button>Agregar Productos</button> -->
-                    <button>No,Gracias</button>
+                    <button on:click={uploadImageToFirebase}>Publicar</button>
                     <!-- <button>Aceptar</button> -->
                 </div>
-                
             </div>
-            
         {/if}
     </div>
 </div>
 
 <style>
-
-    *{
+    * {
         margin: 0;
         font-family:
             system-ui,
@@ -87,12 +215,15 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
             "Helvetica Neue",
             sans-serif;
     }
+    .hidden {
+        display: none;
+    }
     .messagebox__container {
         display: flex;
         flex-direction: row;
         /* background-color: aqua; */
         gap: 10px;
-        width: 80%;
+        width: 95%;
         /* height: auto; */
         margin-bottom: 20px;
         margin: 10px;
@@ -102,6 +233,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         width: 30px;
         height: 30px;
         object-fit: cover;
+        cursor: pointer;
     }
 
     .messagebox__container-message {
@@ -120,15 +252,14 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         scroll-snap-type: x mandatory;
         gap: 10px;
         /* padding: 10px; */
-        
     }
-    
+
     .item {
-        flex: 0 0 90%;
+        flex: 0 0 100%;
         scroll-snap-align: start;
         position: relative;
     }
-    .item p{
+    .item p {
         font-family:
             system-ui,
             -apple-system,
@@ -143,15 +274,8 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
             sans-serif;
         color: white;
         font-size: 14px;
-        
     }
 
-    @media (min-width: 768px) {
-        .item {
-            flex: 0 0 45%;
-            
-        }
-    }
     /* @media (min-width: 1024px) {
         .item {
             flex: 0 0 40%;
@@ -162,10 +286,32 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         height: auto;
         display: block;
         border-radius: 5px;
-        margin-left: 10px;
-       /* margin: 10px; */
+        object-fit: cover;
+        aspect-ratio: 1 / 1;
+        /* margin-left: 10px; */
+        /* margin: 10px; */
     }
-    .image-info{
+    @media (min-width: 768px) {
+        .item {
+            flex: 0 0 85%;
+        }
+        .cross-sell-container img {
+            /* width: 100%; */
+            height: 580px;
+            width: 100%;
+            /* height: auto; */
+            display: block;
+            border-radius: 5px;
+            object-fit: cover;
+            aspect-ratio: 1 / 1;
+
+            /* display: block;
+            border-radius: 5px; */
+            /* margin-left: 10px; */
+            /* margin: 10px; */
+        }
+    }
+    .image-info {
         display: flex;
         width: 100%;
         justify-content: space-between;
@@ -177,13 +323,13 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         /* padding-bottom: 10px; */
         border-radius: 5px;
     }
-    .image-info p{
+    .image-info p {
         margin-left: 10px;
         color: #e3e3e3;
         font-size: 13px;
         /* background-color: red; */
     }
-    .image-info button{
+    .image-info button {
         /* margin-right: 10px; */
         background-color: transparent;
         border: none;

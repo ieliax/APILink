@@ -13,6 +13,7 @@
         pageInfo,
     } from "../../lib/stores/auth";
     import GptSalesMessagebox from "../../lib/components/GPTSalesMessagebox.svelte";
+    import GptCreateProductobox from "../../lib/components/GPTCreateProductobox.svelte";
 
     export let data;
 
@@ -38,6 +39,15 @@
 
             if (analizeResponse.action === "modelchange") {
                 if (analizeResponse.model == "salesGPT") {
+                    let response = JSON.parse($openaiList);
+                    console.log(response.items);
+                    setTimeout(async () => {
+                        // messages = [...messages,{text: "¡Respuesta automática!",role: "assistant"}];
+                        messagelist.update((m) => [...m,{role: "assistant", text:response.text, model:analizeResponse.model, itemList:response.items}]);
+                        await tick(); // Espera a que Svelte actualice el DOM
+                        scrollToBottom(); // Llama a la función que ajusta el scroll
+                    }, 1000);
+                }else if(analizeResponse.model == "CreateProductGPT"){
                     let response = JSON.parse($openaiList);
                     console.log(response.items);
                     setTimeout(async () => {
@@ -140,6 +150,8 @@
                     {#if message.role == "assistant"}
                         {#if message.model == "salesGPT"}
                             <GptSalesMessagebox role={message.role} message={message.text} crossell={message.itemList} />    
+                            {:else if message.model == "CreateProductGPT"}
+                            <GptCreateProductobox role={message.role} message={message.text} crossell={message.itemList} /> 
                         {/if}
                         
                     {:else if message.role == "user"}

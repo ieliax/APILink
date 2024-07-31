@@ -57,7 +57,7 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
+      gap: 2px;
     }
     .image-cell {
       width: 100%;
@@ -92,7 +92,7 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 3px;
+            gap: 2px;
         }
     }
   </style>
