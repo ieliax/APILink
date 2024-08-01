@@ -15,7 +15,7 @@ export async function loadMoreProducts(lastVisible, userID) {
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 10;
+    const LIMIT = 4;
 
     if (lastVisible) {
       // Si hay un documento visible de la última carga, empieza después de ese documento

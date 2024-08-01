@@ -1,25 +1,40 @@
 <script>
     import { onMount, tick } from "svelte";
+    import { browser } from '$app/environment';
+
     import { userid } from "../../lib/API";
     import GptMessagebox from "../../lib/components/GPTMessagebox.svelte";
     import GptInfo from "../../lib/components/GPTInfo.svelte";
-    let chatboxMain;
-    let textarea;
-    let messages = []; // Esto almacenará los mensajes del chat
-    import {
-        messagelist,
-        openaiList,
-        gptanalizer,
-        pageInfo,
-    } from "../../lib/stores/auth";
+    import {messagelist,openaiList,gptanalizer,pageInfo,} from "../../lib/stores/auth";
     import GptSalesMessagebox from "../../lib/components/GPTSalesMessagebox.svelte";
     import GptCreateProductobox from "../../lib/components/GPTCreateProductobox.svelte";
+    import GptShowProductbox from "../../lib/components/GPTShowProductbox.svelte";
 
     export let data;
 
-    userid.set(data.pageinfo.uid)
+    let chatboxMain;
+    let textarea;
+    let messages = []; // Esto almacenará los mensajes del chat
 
-    
+    let isMobile = true;
+
+    userid.set(data.pageinfo.uid);
+
+    function checkWidth() {
+        const width = window.innerWidth;
+        isMobile = width < 768; // Considera móvil a cualquier dispositivo con un ancho menor a 768px
+    }
+
+    if (browser) {
+        onMount(() => {
+            window.addEventListener("resize", checkWidth);
+            checkWidth(); // Verificar inmediatamente en la carga de la página
+
+            return () => {
+                window.removeEventListener("resize", checkWidth);
+            };
+        });
+    }
     // Función para agregar mensajes al chat
     async function sendMessage() {
         const message = textarea.value.trim();
@@ -43,16 +58,32 @@
                     console.log(response.items);
                     setTimeout(async () => {
                         // messages = [...messages,{text: "¡Respuesta automática!",role: "assistant"}];
-                        messagelist.update((m) => [...m,{role: "assistant", text:response.text, model:analizeResponse.model, itemList:response.items}]);
+                        messagelist.update((m) => [
+                            ...m,
+                            {
+                                role: "assistant",
+                                text: response.text,
+                                model: analizeResponse.model,
+                                itemList: response.items,
+                            },
+                        ]);
                         await tick(); // Espera a que Svelte actualice el DOM
                         scrollToBottom(); // Llama a la función que ajusta el scroll
                     }, 1000);
-                }else if(analizeResponse.model == "CreateProductGPT"){
+                } else if (analizeResponse.model == "CreateProductGPT") {
                     let response = JSON.parse($openaiList);
                     console.log(response.items);
                     setTimeout(async () => {
                         // messages = [...messages,{text: "¡Respuesta automática!",role: "assistant"}];
-                        messagelist.update((m) => [...m,{role: "assistant", text:response.text, model:analizeResponse.model, itemList:response.items}]);
+                        messagelist.update((m) => [
+                            ...m,
+                            {
+                                role: "assistant",
+                                text: response.text,
+                                model: analizeResponse.model,
+                                itemList: response.items,
+                            },
+                        ]);
                         await tick(); // Espera a que Svelte actualice el DOM
                         scrollToBottom(); // Llama a la función que ajusta el scroll
                     }, 1000);
@@ -135,54 +166,73 @@
     }
 </script>
 
-<div class="chatbox">
-    <div class="chatbox__content">
-        <div class="messages" bind:this={chatboxMain}>
-            {#if $messagelist.length == 0}
-                <GptInfo
-                    gptname={data.pageinfo.nickname}
-                    gptlink={"By " + data.pageinfo.biolink}
-                    gptdescription={data.pageinfo.bio}
-                    
-                />
-            {:else}
-                {#each $messagelist as message}
-                    {#if message.role == "assistant"}
-                        {#if message.model == "salesGPT"}
-                            <GptSalesMessagebox role={message.role} message={message.text} crossell={message.itemList} />    
+{#if isMobile}
+  <div>
+    <div class="chatbox">
+        <div class="chatbox__content">
+            <div class="messages" bind:this={chatboxMain}>
+                {#if $messagelist.length == 0}
+                    <GptInfo
+                        gptname={data.pageinfo.nickname}
+                        gptlink={"By " + data.pageinfo.biolink}
+                        gptdescription={data.pageinfo.bio}
+                    />
+                {:else}
+                    {#each $messagelist as message}
+                        {#if message.role == "assistant"}
+                            {#if message.model == "salesGPT"}
+                                <GptSalesMessagebox
+                                    role={message.role}
+                                    message={message.text}
+                                    crossell={message.itemList}
+                                />
                             {:else if message.model == "CreateProductGPT"}
-                            <GptCreateProductobox role={message.role} message={message.text} crossell={message.itemList} /> 
+                                <GptShowProductbox
+                                    role={message.role}
+                                    message={message.text}
+                                    crossell={message.itemList}
+                                />
+                            {/if}
+                        {:else if message.role == "user"}
+                            <!-- {l.content} -->
+                            <GptMessagebox
+                                role={message.role}
+                                message={message.content}
+                            />
                         {/if}
-                        
-                    {:else if message.role == "user"}
-                        <!-- {l.content} -->
-                        <GptMessagebox role={message.role} message={message.content} />
-                    {/if}
+                    {/each}
+                {/if}
+                {#each messages as message}
+                    <!-- <div class={`message ${message.role}`}>
+                        {message.text}
+                    </div> -->
+                    <!-- <GptMessagebox role={message.role} message={message.text} /> -->
                 {/each}
-            {/if}
-            {#each messages as message}
-                <!-- <div class={`message ${message.role}`}>
-                    {message.text}
-                </div> -->
-                <!-- <GptMessagebox role={message.role} message={message.text} /> -->
-            {/each}
+            </div>
+            <div class="input-area">
+                <textarea
+                    bind:this={textarea}
+                    class="textarea"
+                    on:input={autoResize}
+                    on:keydown={handleKeydown}
+                    placeholder="Message ChatGPT"
+                ></textarea>
+                <button on:click={sendMessage}>Send</button>
+            </div>
+            <!-- <div class="input-grid">
+                <textarea bind:this={textarea} class="textarea" on:input={autoResize}  on:keydown={handleKeydown}></textarea>
+                <button on:click={sendMessage}>Send</button>
+            </div> -->
         </div>
-        <div class="input-area">
-            <textarea
-                bind:this={textarea}
-                class="textarea"
-                on:input={autoResize}
-                on:keydown={handleKeydown}
-                placeholder="Message ChatGPT"
-            ></textarea>
-            <button on:click={sendMessage}>Send</button>
-        </div>
-        <!-- <div class="input-grid">
-            <textarea bind:this={textarea} class="textarea" on:input={autoResize}  on:keydown={handleKeydown}></textarea>
-            <button on:click={sendMessage}>Send</button>
-        </div> -->
     </div>
-</div>
+    
+  </div>
+{:else}
+  <div style="background-color: black; color: white; height: 100vh; width: 100%; margin: -8px; display: flex; align-items: center; justify-content: center;">
+    Lo sentimos, esta página está optimizada solo para dispositivos móviles.
+  </div>
+{/if}
+
 
 <style>
     * {

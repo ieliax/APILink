@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { serverTimestamp } from "firebase/firestore";
     import { uploadImage, userid, createProduct} from "../API";
+    import { browser } from '$app/environment';
 
     export let message = `¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1.
 
@@ -17,6 +18,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
     let container;
     let imageUrl = "imageplaceholder.jpg";
     let resizedImageBlob;
+    let resizedThumbImageBlob;
 
     // Mytextarea.scrollTop = Mytextarea.scrollHeight;
 
@@ -41,7 +43,9 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         if (imageUrl) {
             URL.revokeObjectURL(imageUrl);
         }
-        fileInput.removeEventListener("change", handleFileChange);
+        if (fileInput) {
+            fileInput.removeEventListener("change", handleFileChange);
+        }
         // window.removeEventListener('resize', adjustTextareaHeight); // Limpiar el listener al destruir el componente
     });
 
@@ -50,76 +54,79 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
     }
 
     function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file) {
-            // Revoca la URL anterior si existe
-            if (imageUrl) {
-                URL.revokeObjectURL(imageUrl);
-            }
-
-            // Crea un objeto de imagen para verificar las dimensiones
-            const img = new Image();
-            img.onload = () => {
-                // Calcula la relación de aspecto
-                const aspectRatio = img.width / img.height;
-
-                const file = event.target.files[0];
-                if (file) {
-                    resizeImage(file, 1080, 1080, (blob) => {
-                        if (imageUrl) {
-                            URL.revokeObjectURL(imageUrl);
-                        }
-                        resizedImageBlob = blob;
-                        imageUrl = URL.createObjectURL(blob);
-                    });
-                }
-            };
-            img.onerror = () => {
-                alert("No se pudo cargar la imagen.");
-            };
-            img.src = URL.createObjectURL(file);
-        }
+    const file = event.target.files[0];
+    if (!file) {
+        alert("No se seleccionó ningún archivo.");
+        return;
     }
+
+    // Revoca la URL anterior si existe
+    if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+    }
+    // if (thumbImageUrl) {
+    //     URL.revokeObjectURL(thumbImageUrl);
+    // }
+
+    // Crea un objeto de imagen para verificar las dimensiones y luego redimensionar
+    const img = new Image();
+    img.onload = () => {
+        // Calcula la relación de aspecto
+        const aspectRatio = img.width / img.height;
+        console.log("Relación de Aspecto: ", aspectRatio); // Opcional, para depuración
+
+        // Redimensiona para la imagen principal
+        resizeImage(file, 1080, 1080, (blob) => {
+            resizedImageBlob = blob;
+            imageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la imagen principal
+        });
+
+        // Redimensiona para la miniatura
+        resizeImage(file, 300, 300, (blob) => {
+            resizedThumbImageBlob = blob;
+            //thumbImageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la miniatura
+        });
+    };
+    img.onerror = () => {
+        alert("No se pudo cargar la imagen.");
+    };
+    img.src = URL.createObjectURL(file); // Esto crea una URL que se utiliza para cargar la imagen en el objeto Image
+}
 
     function resizeImage(file, maxWidth, maxHeight, callback) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const img = new Image();
-            img.onload = function () {
-                const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
 
-                // Ajustar la imagen a la proporción deseada
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height *= maxWidth / width;
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width *= maxHeight / height;
-                        height = maxHeight;
-                    }
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
                 }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
 
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, width, height);
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
 
-                canvas.toBlob(
-                    function (blob) {
-                        callback(blob);
-                    },
-                    "image/jpeg",
-                    0.85,
-                ); // Ajusta la calidad de la imagen aquí, 0.85 es típicamente bueno
-            };
-            img.src = e.target.result;
+            canvas.toBlob((blob) => {
+                callback(blob);
+            }, 'image/jpeg', 0.85);
         };
-        reader.readAsDataURL(file);
-    }
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 
     function uploadImageToFirebase() {
         if (!resizedImageBlob) {
@@ -152,8 +159,15 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
 <div class="messagebox">
     <div class="messagebox__container">
         {#if role == "assistant"}
-            <img src={imageurl} alt="" />
+            <!-- <img src={imageurl} alt="" /> -->
             <div class="messagebox__container-message">
+                <textarea
+                    name=""
+                    bind:this={myTextarea}
+                    on:input={adjustTextareaHeight}
+                    placeholder="¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1. Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarella y una Ensalad"
+                    >{message}</textarea
+                >
                 <div class="cross-sell-container" bind:this={container}>
                     {#each crossell as item}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -182,13 +196,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
                         </div>
                     {/each}
                 </div>
-                <textarea
-                    name=""
-                    bind:this={myTextarea}
-                    on:input={adjustTextareaHeight}
-                    placeholder="¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1. Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarella y una Ensalad"
-                    >{message}</textarea
-                >
+                
                 <div class="buttonSection">
                     <!-- <button>Agregar Productos</button> -->
                     <button on:click={uploadImageToFirebase}>Publicar</button>
@@ -291,26 +299,7 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         /* margin-left: 10px; */
         /* margin: 10px; */
     }
-    @media (min-width: 768px) {
-        .item {
-            flex: 0 0 85%;
-        }
-        .cross-sell-container img {
-            /* width: 100%; */
-            height: 580px;
-            width: 100%;
-            /* height: auto; */
-            display: block;
-            border-radius: 5px;
-            object-fit: cover;
-            aspect-ratio: 1 / 1;
 
-            /* display: block;
-            border-radius: 5px; */
-            /* margin-left: 10px; */
-            /* margin: 10px; */
-        }
-    }
     .image-info {
         display: flex;
         width: 100%;
@@ -398,5 +387,29 @@ Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarell
         /* padding: 5px; */
         /* box-sizing: border-box; */
         /* padding: 10px; */
+    }
+
+    @media (min-width: 768px) {
+        .item {
+            flex: 0 0 85%;
+        }
+        .cross-sell-container img {
+            /* width: 100%; */
+            height: 580px;
+            width: 100%;
+            /* height: auto; */
+            display: block;
+            border-radius: 5px;
+            object-fit: cover;
+            aspect-ratio: 1 / 1;
+
+            /* display: block;
+            border-radius: 5px; */
+            /* margin-left: 10px; */
+            /* margin: 10px; */
+        }
+        .messagebox__container-message textarea {
+            width: 85%;
+        }
     }
 </style>
