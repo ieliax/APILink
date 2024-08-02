@@ -40,6 +40,9 @@ async function handleLoadMore() {
 </script>
 
 <div class="grid">
+  {#if products.length != 0 && loadmore}
+  <button class="load-more-button" on:click={handleLoadMore}>+</button>
+  {/if}
   {#each products as image}
     <div class="image-cell">
       <img src={image.image} alt="Imagen descriptiva">
@@ -47,9 +50,7 @@ async function handleLoadMore() {
   {/each}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-   {#if products.length != 0 && loadmore}
-   <button class="load-more-button" on:click={handleLoadMore}>+</button>
-   {/if}
+  
 
 </div>
 

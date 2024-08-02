@@ -19,10 +19,10 @@ export async function loadMoreProducts(lastVisible, userID) {
 
     if (lastVisible) {
       // Si hay un documento visible de la última carga, empieza después de ese documento
-      queryRef = query(productsRef, orderBy("campoOrdenar"), startAfter(lastVisible), limit(LIMIT));
+      queryRef = query(productsRef, orderBy("timestamp"), startAfter(lastVisible), limit(LIMIT));
     } else {
       // Si no hay un documento visible (primera carga), simplemente aplica el límite
-      queryRef = query(productsRef, orderBy("campoOrdenar"), limit(LIMIT));
+      queryRef = query(productsRef, orderBy("timestamp"), limit(LIMIT));
     }
 
     try {

@@ -2,10 +2,14 @@
     import { onMount, tick } from "svelte";
     import ImageGrid from "./ImageGrid.svelte";
     import Modal from "./Modal.svelte";
+    import UserProductView from "./UserProductView.svelte";
     export let gptname;
     export let gptlink;
     export let gptdescription;
     let modalOpen = false;
+    let modalOpen2 = false;
+    let modalOpen3 = false;
+
 
     const imageurl =
         "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/640px-Starbucks_Corporation_Logo_2011.svg.png";
@@ -37,6 +41,12 @@
     function toggleModal() {
         modalOpen = !modalOpen;
     }
+    function toggleModal2() {
+        modalOpen2 = !modalOpen2;
+    }
+    function toggleModal3() {
+        modalOpen3 = !modalOpen3;
+    }
 
 </script>
 
@@ -50,14 +60,18 @@
         </div>
         <!-- <ImageGrid images={images}/> -->
         <div class="button-container">
-            <button class="custom-button" on:click={toggleModal}>Button 1</button>
-            <button class="custom-button">Button 2</button>
-            <button class="custom-button">Button 3</button>
+            <button class="custom-button" on:click={toggleModal}>Product</button>
+            <button class="custom-button" on:click={toggleModal2}>FAQS</button>
+            <button class="custom-button" on:click={toggleModal3}>Button 3</button>
         </div>
     </div>
     <Modal isOpen={modalOpen} close={toggleModal}>
         <p>This is the content inside the modal!</p>
     </Modal>
+    <UserProductView isOpen={modalOpen2} close={toggleModal2}>
+        <p>This is the content inside the modal!</p>
+    </UserProductView>
+    
 </div>
 
 <style>
