@@ -11,6 +11,8 @@
     export let close;
     export let publish;
 
+    let imageAspectRatio = '1 / 1';  // Valor predeterminado
+
     let fileInput;
 
     let myTextarea;
@@ -30,88 +32,79 @@
         // fileInput.addEventListener("change", handleFileChange);
     });
 
-    async function handleFile(event) {
+    function handleFile(event) {
         const file = event.target.files[0];
-        console.log(file);
-        if (file) {
-            // let newURL = await handleFileChange($firebaseid, file, "logo");
-            // let response = await actualizarUrlImagenEnFirestore($firebaseid, newURL);
-            // if (response) {
-            //     // image = newURL;
-            //      $pagename = "asdasd"
-            //     pagelogo.update(image =>{
-            //         image = newURL;
-            //         return image;
-            //     });
+        if (!file) {
+            return;
+        }
 
-            // }
-            if (imageUrl) {
-                URL.revokeObjectURL(imageUrl);
+        const img = new Image();
+        img.onload = () => {
+            const aspectRatio = img.width / img.height;
+            resizeImage(file, 1080, (blob, newAspectRatio) => {
+                resizedImageBlob = blob;
+                imageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la imagen principal
+                imageAspectRatio = newAspectRatio; // Actualiza la relación de aspecto
+            });
+
+            resizeImage(file, 300, (blob) => {
+                resizedThumbImageBlob = blob;
+            });
+        };
+        img.onerror = () => {
+            alert("No se pudo cargar la imagen.");
+        };
+        img.src = URL.createObjectURL(file); // Esto crea una URL que se utiliza para cargar la imagen en el objeto Image
+    }
+
+
+    function resizeImage(file, targetSize, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let sourceX, sourceY, sourceWidth, sourceHeight;
+            const aspectRatio = img.width / img.height;
+
+            let newAspectRatio;
+            if (aspectRatio >= 1) {
+                // Imagen más ancha que alta o cuadrada
+                canvas.width = targetSize;
+                canvas.height = targetSize;
+                sourceHeight = img.height;
+                sourceWidth = img.height;
+                sourceX = (img.width - sourceWidth) / 2;
+                sourceY = 0;
+                newAspectRatio = '1 / 1'; // Mantén un aspect ratio cuadrado
+            } else {
+                // Imagen más alta que ancha
+                canvas.width = targetSize;
+                canvas.height = targetSize * (5 / 4); // Ajusta la altura para que sea 4:5
+                sourceWidth = img.width;
+                sourceHeight = img.width * (5 / 4);
+                sourceX = 0;
+                sourceY = (img.height - sourceHeight) / 2;
+                newAspectRatio = '4 / 5'; // Ajusta a un aspect ratio de 4:5
             }
 
-            const img = new Image();
-            img.onload = () => {
-                // Calcula la relación de aspecto
-                const aspectRatio = img.width / img.height;
-                console.log("Relación de Aspecto: ", aspectRatio); // Opcional, para depuración
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
 
-                // Redimensiona para la imagen principal
-                resizeImage(file, 1080, 1080, (blob) => {
-                    resizedImageBlob = blob;
-                    imageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la imagen principal
-                });
-
-                // Redimensiona para la miniatura
-                resizeImage(file, 300, 300, (blob) => {
-                    resizedThumbImageBlob = blob;
-                    //thumbImageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la miniatura
-                });
-            };
-            img.onerror = () => {
-                alert("No se pudo cargar la imagen.");
-            };
-            img.src = URL.createObjectURL(file); // Esto crea una URL que se utiliza para cargar la imagen en el objeto Image
-        }
-    }
-
-    function resizeImage(file, maxWidth, maxHeight, callback) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height *= maxWidth / width;
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width *= maxHeight / height;
-                        height = maxHeight;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob(
-                    (blob) => {
-                        callback(blob);
-                    },
-                    "image/jpeg",
-                    0.85,
-                );
-            };
-            img.src = e.target.result;
+            canvas.toBlob((blob) => {
+                callback(blob, newAspectRatio);
+            }, "image/jpeg", 0.85);
         };
-        reader.readAsDataURL(file);
-    }
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+
+
+
+
+
 
     function uploadImageToFirebase() {
         if (!resizedImageBlob) {
@@ -208,6 +201,7 @@
                     src={imageUrl}
                     alt="logo"
                     on:click={() => fileInput.click()}
+                    style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
                 />
                 <textarea
                     name=""
@@ -279,7 +273,7 @@
         display: block;
         border-radius: 5px;
         object-fit: cover;
-        aspect-ratio: 1 / 1;
+        /* aspect-ratio: 4 / 5; */
         /* margin-left: 10px; */
         /* margin: 10px; */
     }

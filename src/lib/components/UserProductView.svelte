@@ -19,7 +19,8 @@
     let runAnimation = false;
 
     onMount(async () => {
-        const { products: initialProducts, lastVisible: newLastVisible } = await loadMoreProducts(null, $userid);
+        const { products: initialProducts, lastVisible: newLastVisible } =
+            await loadMoreProducts(null, $userid);
 
         $productList = initialProducts;
         lastVisible = newLastVisible;
@@ -47,11 +48,10 @@
     }
 
     function toggleModalRunAnimation(event) {
-        modalOpen = !modalOpen;
+        modalOpen = false;
         runAnimation = event.detail.showalert;
-        console.log(runAnimation)
+        console.log(runAnimation);
     }
-   
 </script>
 
 {#if isOpen}
@@ -71,21 +71,25 @@
 
             <div class="grid">
                 {#if runAnimation}
-                <button class="load-more-button" on:click={toggleModal}>+</button>
+                    <button class="load-more-button" on:click={toggleModal}
+                        >+</button
+                    >
                 {/if}
                 {#each $productList as image}
-                  <div class="image-cell">
-                    <img src={image.thumbs} alt="Imagen descriptiva">
-                  </div>
+                    <div class="image-cell">
+                        <img src={image.thumbs} alt="Imagen descriptiva" />
+                    </div>
                 {/each}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
-                
-              
-              </div>
+            </div>
         </div>
     </div>
-    <Modal isOpen={modalOpen} on:close={toggleModal} on:publish={toggleModalRunAnimation}>
+    <Modal
+        isOpen={modalOpen}
+        on:close={toggleModal}
+        on:publish={toggleModalRunAnimation}
+    >
         <p>This is the content inside the modal!</p>
     </Modal>
 {/if}
@@ -118,7 +122,7 @@
         height: 60px;
         justify-content: center;
         align-items: center; */
-        
+
         display: grid;
         position: sticky;
         top: 0;
@@ -130,7 +134,6 @@
     .topbar p {
         /* background-color: red; */
         text-align: center;
-        
     }
     .topbar button {
         width: 60px;
@@ -138,50 +141,51 @@
     }
 
     .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas en todas las resoluciones */
-    gap: 2px;
-    /* background-color: red; Solo para demostración, puedes quitarlo */
-  }
+        display: grid;
+        grid-template-columns: repeat(
+            3,
+            1fr
+        ); /* 3 columnas en todas las resoluciones */
+        gap: 2px;
+    }
 
-  .image-cell {
-   
+    .image-cell {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0f0f0; /* Fondo uniforme para todas las celdas */
-  }
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+    height: 150px; /* Asegura una altura uniforme para todas las celdas */
+    background-color: #f0f0f0;
+}
 
-  .image-cell img {
-    width: 100%; /* Cubre todo el ancho de la celda */
-    height: 100%; /* Cubre todo el alto de la celda */
-    object-fit: cover; /* Mantiene las proporciones sin recortar */
-  }
+    .image-cell img {
+        width: 100%; /* Cubre todo el ancho de la celda */
+        height: 100%; /* Cubre todo el alto de la celda */
+        object-fit: cover; /* Mantiene las proporciones sin recortar */
+    }
 
-  .load-more-cell {
-    height: 50px;
-    cursor: pointer;
-    color: #333; /* Color del texto para el botón 'Cargar más' */
-    font-size: 16px; /* Tamaño del texto ajustado para visibilidad */
-    background-color: transparent; /* Fondo transparente o ajusta según el diseño deseado */
-    width: 100%; /* Asegura que ocupe toda la celda */
-  }
+    .load-more-cell {
+        height: 50px;
+        cursor: pointer;
+        color: #333; /* Color del texto para el botón 'Cargar más' */
+        font-size: 16px; /* Tamaño del texto ajustado para visibilidad */
+        background-color: transparent; /* Fondo transparente o ajusta según el diseño deseado */
+        width: 100%; /* Asegura que ocupe toda la celda */
+    }
 
-  .load-more-button {
-    
-    color: white;
-    background-color: transparent;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 60px;
-  }
-  .Add{
-    color: white;
-    background-color: transparent;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 40px;
-  }
+    .load-more-button {
+        color: white;
+        background-color: transparent;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 60px;
+    }
+    .Add {
+        color: white;
+        background-color: transparent;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 40px;
+    }
 </style>
