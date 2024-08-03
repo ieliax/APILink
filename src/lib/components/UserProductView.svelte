@@ -153,8 +153,9 @@
     display: flex;
     align-items: center; /* Centra verticalmente */
     justify-content: center; /* Centra horizontalmente */
-    height: 150px; /* Asegura una altura uniforme para todas las celdas */
+    height: auto;
     background-color: #f0f0f0;
+    aspect-ratio: 1/1;
 }
 
     .image-cell img {
