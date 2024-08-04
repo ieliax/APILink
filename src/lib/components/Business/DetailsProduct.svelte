@@ -125,7 +125,8 @@
                             src={$fullSizeImagesCache[image.id]}
                             on:load={() => handleImageLoaded(index)}
                             on:click={() => eventHandler(index)}
-                            style="opacity: {image.opacity}; "
+                            style="opacity: {image.opacity}; aspect-ratio: {image.aspectRatio}"
+                            
                             alt="Imagen descriptiva"
                         />
                     </div>
