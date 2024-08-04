@@ -56,7 +56,7 @@
         const img = new Image();
         img.onload = () => {
             const aspectRatio = img.width / img.height;
-            resizeImage(file, 1080,0.85, (blob, newAspectRatio) => {
+            resizeImage(file, 1080,0.40, (blob, newAspectRatio) => {
                 resizedImageBlob = blob;
                 imageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la imagen principal
                 imageAspectRatio = newAspectRatio; // Actualiza la relación de aspecto

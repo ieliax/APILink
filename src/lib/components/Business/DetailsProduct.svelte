@@ -113,7 +113,7 @@
                 {#if runAnimation}
                     <button class="load-more-button">+</button>
                 {/if}
-                <!-- {#each $productList as image, index}
+                {#each $productList as image, index}
      
                     <div class="image-cell" bind:this={itemRefs[index]}>
                      
@@ -129,8 +129,8 @@
                             alt="Imagen descriptiva"
                         />
                     </div>
-                {/each} -->
-                <div class="image-cell"  bind:this={itemRefs[$productIndex]}>
+                {/each}
+                <!-- <div class="image-cell"  bind:this={itemRefs[$productIndex]}>
                  
                      <div class="cellheader">
                        asdasd
@@ -143,7 +143,7 @@
                         style="opacity: {$productList[$productIndex].opacity}; aspect-ratio: {$productList[$productIndex].aspectRatio}"
                         alt="Imagen descriptiva"
                     />
-                </div>
+                </div> -->
 
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
