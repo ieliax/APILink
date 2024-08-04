@@ -1,15 +1,17 @@
 <script>
     import { onMount, tick } from "svelte";
     import ImageGrid from "./ImageGrid.svelte";
-    import Modal from "./Modal.svelte";
-    import UserProductView from "./UserProductView.svelte";
+    // import Modal from "./CreateProduct.svelte";
+    import UserProducts from "./Business/UserProducts.svelte"
+    import { productList } from "../stores/adminStore";
     export let gptname;
     export let gptlink;
     export let gptdescription;
-    let modalOpen = false;
-    let modalOpen2 = false;
-    let modalOpen3 = false;
 
+    let modalOpen = false;
+    let isOpenUserProductModal = false;
+    let modalOpen3 = false;
+    // UserProductView
 
     const imageurl =
         "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/640px-Starbucks_Corporation_Logo_2011.svg.png";
@@ -28,21 +30,12 @@
         window.addEventListener("resize", setVH);
     });
 
-    let images = [
-        "https://scontent.fhex5-2.fna.fbcdn.net/v/t39.30808-6/453007007_909219551232943_4806353232977117812_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=qBXgEWZrvEQQ7kNvgEsNxZw&_nc_ht=scontent.fhex5-2.fna&oh=00_AYCFE1a_9DO4382zi8TZm8iICW2Zi2I2fMcPD7IJb1FCfg&oe=66ACD1F9",
-        "https://scontent.fhex5-1.fna.fbcdn.net/v/t39.30808-6/453062572_909218277899737_4033827574117945959_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=IDYgGXwtJiAQ7kNvgHfTbPs&_nc_ht=scontent.fhex5-1.fna&oh=00_AYAOZCabhX1CQLZBckneC0rDh6rCxEoYraciQnvbxauiAQ&oe=66ACCED3",
-        "https://scontent.fhex5-2.fna.fbcdn.net/v/t39.30808-6/453012081_908664667955098_6067738936929298697_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=KHAmiKRKS_8Q7kNvgH3P4-w&_nc_ht=scontent.fhex5-2.fna&oh=00_AYBtnn3oOOZobWIDSLE9PESEbSlffps4xgVejvu0YrLgvQ&oe=66ACD3DE",
-        "https://scontent.fhex5-2.fna.fbcdn.net/v/t39.30808-6/453014907_908664654621766_2803209995352530567_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=xg-Z2WMNQvcQ7kNvgGrM1T_&_nc_ht=scontent.fhex5-2.fna&oh=00_AYC3p7dcV6KAUIXauLmau2XaOAAPp5NXZzZ6HOG6XzYBLg&oe=66ACC586",
-        "https://scontent.fhex5-2.fna.fbcdn.net/v/t39.30808-6/453012081_908664667955098_6067738936929298697_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=KHAmiKRKS_8Q7kNvgH3P4-w&_nc_ht=scontent.fhex5-2.fna&oh=00_AYBtnn3oOOZobWIDSLE9PESEbSlffps4xgVejvu0YrLgvQ&oe=66ACD3DE",
-        "https://scontent.fhex5-2.fna.fbcdn.net/v/t39.30808-6/453014907_908664654621766_2803209995352530567_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=xg-Z2WMNQvcQ7kNvgGrM1T_&_nc_ht=scontent.fhex5-2.fna&oh=00_AYC3p7dcV6KAUIXauLmau2XaOAAPp5NXZzZ6HOG6XzYBLg&oe=66ACC586",
-        // Más URLs de imágenes
-    ];
 
     function toggleModal() {
         modalOpen = !modalOpen;
     }
-    function toggleModal2() {
-        modalOpen2 = !modalOpen2;
+    function toggleUserProductModal() {
+        isOpenUserProductModal = !isOpenUserProductModal;
     }
     function toggleModal3() {
         modalOpen3 = !modalOpen3;
@@ -61,16 +54,17 @@
         <!-- <ImageGrid images={images}/> -->
         <div class="button-container">
             <button class="custom-button" on:click={toggleModal}>Product</button>
-            <button class="custom-button" on:click={toggleModal2}>FAQS</button>
+            <button class="custom-button" on:click={toggleUserProductModal}>FAQS</button>
             <button class="custom-button" on:click={toggleModal3}>Button 3</button>
         </div>
     </div>
-    <Modal isOpen={modalOpen} close={toggleModal}>
-        <p>This is the content inside the modal!</p>
-    </Modal>
-    <UserProductView isOpen={modalOpen2} close={toggleModal2}>
-        <p>This is the content inside the modal!</p>
-    </UserProductView>
+    <!-- <Modal isOpen={modalOpen} close={toggleModal}/> -->
+    {#if isOpenUserProductModal}
+        <UserProducts isOpen={isOpenUserProductModal} on:close={toggleUserProductModal}/>   
+    {/if}
+     
+    
+   
     
 </div>
 

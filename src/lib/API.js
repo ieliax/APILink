@@ -15,14 +15,14 @@ export async function loadMoreProducts(lastVisible, userID) {
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 9;
+    const LIMIT = 6;
 
     if (lastVisible) {
       // Si hay un documento visible de la última carga, empieza después de ese documento
-      queryRef = query(productsRef, orderBy("timestamp"), startAfter(lastVisible), limit(LIMIT));
+      queryRef = query(productsRef, orderBy("timestamp","desc"), startAfter(lastVisible), limit(LIMIT));
     } else {
       // Si no hay un documento visible (primera carga), simplemente aplica el límite
-      queryRef = query(productsRef, orderBy("timestamp"), limit(LIMIT));
+      queryRef = query(productsRef, orderBy("timestamp","desc"), limit(LIMIT));
     }
 
     try {
@@ -112,30 +112,7 @@ export async function collectionByName(collectionName) {
     }
 }
 
-export const createProduct = async (collectionURL,objectProduct) => {
-    // Define la referencia de la colección donde se agregará el nuevo documento
-    const documentid = doc(collection(db, collectionURL)).id;
-    const docRef = doc(db, collectionURL, documentid);
-    
-    // const object = {
-    //     name:"NEW GPT",
-    //     description:"DETALLADO",
-    //     timestamp:serverTimestamp()
-    // }
-  
-    try {
-      // Agrega el documento a la colección. Firestore genera automáticamente el ID del documento.
-      await setDoc(docRef, objectProduct);
-        // promotionPosts.update(currentPosts => {
-        //     return [...currentPosts, object]; 
-        // });
 
-      return { success: true, id: docRef.id }; // Retorna true y el ID del nuevo documento si la operación fue exitosa
-    } catch (error) {
-      console.error("Error al agregar el documento:", error);
-      return { success: false, error: error }; // Retorna false y el error si hubo un error
-    }
-  };
 
 
 export const createGPTInfo = async (user_uid) => {
@@ -189,6 +166,7 @@ export async function uploadBaseknowled(uid, filenamePrefix, contentString) {
 
 
 
+//UPLOAD PRODUCT
 export async function uploadImage(uid, filenamePrefix, file) {
     const filename = `${filenamePrefix}.${file.type.split('/')[1]}`; // Define la extensión basada en el tipo MIME del archivo
     const fileRef = ref(storage, `users/${uid}/${filename}`);
@@ -208,6 +186,26 @@ export async function uploadImage(uid, filenamePrefix, file) {
         throw error; // Lanza el error para manejo externo si es necesario
     }
 }
+
+//CREATE PRODUCT
+export const createProduct = async (collectionURL,objectProduct) => {
+    // Define la referencia de la colección donde se agregará el nuevo documento
+    const documentid = doc(collection(db, collectionURL)).id;
+    const docRef = doc(db, collectionURL, documentid);
+
+    try {
+      // Agrega el documento a la colección. Firestore genera automáticamente el ID del documento.
+      await setDoc(docRef, objectProduct);
+        // promotionPosts.update(currentPosts => {
+        //     return [...currentPosts, object]; 
+        // });
+
+      return { success: true, id: docRef.id }; // Retorna true y el ID del nuevo documento si la operación fue exitosa
+    } catch (error) {
+      console.error("Error al agregar el documento:", error);
+      return { success: false, error: error }; // Retorna false y el error si hubo un error
+    }
+  };
 
 
 

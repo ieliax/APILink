@@ -20,6 +20,7 @@
 		"firebase": "^10.12.2",
 		"flatpickr": "^4.6.13",
 		"openai": "^4.52.7",
-		"svelte-flatpickr": "^3.3.4"
+		"svelte-flatpickr": "^3.3.4",
+		"uuid": "^10.0.0"
 	}
 }

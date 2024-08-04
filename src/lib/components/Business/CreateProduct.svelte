@@ -1,9 +1,10 @@
 <script>
     import { onMount, onDestroy, createEventDispatcher } from "svelte";
     import { browser } from "$app/environment";
-    import { productList } from "../stores/adminStore";
+    import { productList } from "../../stores/adminStore";
     import { serverTimestamp } from "firebase/firestore";
-    import { uploadImage, userid, createProduct } from "../API";
+    import { uploadImage, userid, createProduct } from "../../API";
+    import { v4 as uuidv4 } from "uuid";
 
     const dispatch = createEventDispatcher();
 
@@ -11,7 +12,7 @@
     export let close;
     export let publish;
 
-    let imageAspectRatio = '1 / 1';  // Valor predeterminado
+    let imageAspectRatio = "1 / 1"; // Valor predeterminado
 
     let fileInput;
 
@@ -21,9 +22,7 @@
     let resizedImageBlob;
     let resizedThumbImageBlob;
 
-    console.log($userid)
-
-    
+    console.log(uuidv4());
 
     onMount(() => {
         // window.addEventListener('resize', adjustTextareaHeight);
@@ -31,132 +30,6 @@
         console.log(window.innerWidth);
         // fileInput.addEventListener("change", handleFileChange);
     });
-
-    function handleFile(event) {
-        const file = event.target.files[0];
-        if (!file) {
-            return;
-        }
-
-        const img = new Image();
-        img.onload = () => {
-            const aspectRatio = img.width / img.height;
-            resizeImage(file, 1080, (blob, newAspectRatio) => {
-                resizedImageBlob = blob;
-                imageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la imagen principal
-                imageAspectRatio = newAspectRatio; // Actualiza la relación de aspecto
-            });
-
-            resizeImage(file, 300, (blob) => {
-                resizedThumbImageBlob = blob;
-            });
-        };
-        img.onerror = () => {
-            alert("No se pudo cargar la imagen.");
-        };
-        img.src = URL.createObjectURL(file); // Esto crea una URL que se utiliza para cargar la imagen en el objeto Image
-    }
-
-
-    function resizeImage(file, targetSize, callback) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement("canvas");
-            let sourceX, sourceY, sourceWidth, sourceHeight;
-            const aspectRatio = img.width / img.height;
-
-            let newAspectRatio;
-            if (aspectRatio >= 1) {
-                // Imagen más ancha que alta o cuadrada
-                canvas.width = targetSize;
-                canvas.height = targetSize;
-                sourceHeight = img.height;
-                sourceWidth = img.height;
-                sourceX = (img.width - sourceWidth) / 2;
-                sourceY = 0;
-                newAspectRatio = '1 / 1'; // Mantén un aspect ratio cuadrado
-            } else {
-                // Imagen más alta que ancha
-                canvas.width = targetSize;
-                canvas.height = targetSize * (5 / 4); // Ajusta la altura para que sea 4:5
-                sourceWidth = img.width;
-                sourceHeight = img.width * (5 / 4);
-                sourceX = 0;
-                sourceY = (img.height - sourceHeight) / 2;
-                newAspectRatio = '4 / 5'; // Ajusta a un aspect ratio de 4:5
-            }
-
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
-
-            canvas.toBlob((blob) => {
-                callback(blob, newAspectRatio);
-            }, "image/jpeg", 0.85);
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-
-
-
-
-
-
-    function uploadImageToFirebase() {
-        if (!resizedImageBlob) {
-            console.error("No hay imagen redimensionada para subir.");
-            return;
-        }
-
-        const uid = $userid;
-        const filenamePrefix = "resized-image";
-        const timestamp = new Date().getTime();
-        onPublish(true);
-        uploadImage(uid, filenamePrefix + timestamp, resizedImageBlob)
-            .then((downloadURL) => {
-                console.log("Imagen grande subida con éxito:", downloadURL);
-
-                uploadImage(uid, filenamePrefix + timestamp, resizedThumbImageBlob)
-                    .then((minidownloadURL) => {
-                        console.log(
-                            "Imagen miniatura subida con éxito:",
-                            downloadURL,
-                        );
-                        const objectProduct = {
-                            name: "NEW GPT",
-                            description: "DETALLADO",
-                            image: downloadURL,
-                            thumbs:minidownloadURL,
-                            campoOrdenar: "4",
-                            timestamp: serverTimestamp(),
-                        };
-                        createProduct(`products/${uid}/userProducts`,objectProduct);
-                        productList.update((product) =>{
-                            const object ={
-                            name: "NEW GPT",
-                            description: "DETALLADO",
-                            image: downloadURL,
-                            thumbs:minidownloadURL,
-                            campoOrdenar: "4",
-                        };
-                            product = [object,...product];
-                            
-                            return product
-                        });
-                        onPublish(false);
-                    })
-                    .catch((error) => {
-                        console.error("Error al subir la imagen:", error);
-                    });
-            })
-            .catch((error) => {
-                console.error("Error al subir la imagen:", error);
-            });
-    }
 
     function adjustTextareaHeight() {
         // Establecer altura automáticamente basada en el contenido
@@ -167,12 +40,158 @@
         }
     }
 
-    function onClose(){
-        dispatch("close")
+    onDestroy(() => {
+        if (imageUrl) {
+            URL.revokeObjectURL(imageUrl);
+        }
+    });
+
+    function handleFile(event) {
+        const file = event.target.files[0];
+        if (!file && imageUrl != "imageplaceholder.jpg") {
+            return;
+        }
+
+        imageUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            const aspectRatio = img.width / img.height;
+            resizeImage(file, 1080,0.85, (blob, newAspectRatio) => {
+                resizedImageBlob = blob;
+                imageUrl = URL.createObjectURL(blob); // Actualiza la URL para visualización de la imagen principal
+                imageAspectRatio = newAspectRatio; // Actualiza la relación de aspecto
+            });
+
+            resizeImage(file, 300,0.70, (blob) => {
+                resizedThumbImageBlob = blob;
+            });
+        };
+        img.onerror = () => {
+            alert("No se pudo cargar la imagen.");
+        };
+        img.src = URL.createObjectURL(file); // Esto crea una URL que se utiliza para cargar la imagen en el objeto Image
     }
 
-    function onPublish(loading){
-        dispatch('publish',{showalert:loading});
+    function resizeImage(file, targetSize,quality, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                let sourceX, sourceY, sourceWidth, sourceHeight;
+                const aspectRatio = img.width / img.height;
+
+                let newAspectRatio;
+                if (aspectRatio >= 1) {
+                    // Imagen más ancha que alta o cuadrada
+                    canvas.width = targetSize;
+                    canvas.height = targetSize;
+                    sourceHeight = img.height;
+                    sourceWidth = img.height;
+                    sourceX = (img.width - sourceWidth) / 2;
+                    sourceY = 0;
+                    newAspectRatio = "1 / 1"; // Mantén un aspect ratio cuadrado
+                } else {
+                    // Imagen más alta que ancha
+                    canvas.width = targetSize;
+                    canvas.height = targetSize * (5 / 4); // Ajusta la altura para que sea 4:5
+                    sourceWidth = img.width;
+                    sourceHeight = img.width * (5 / 4);
+                    sourceX = 0;
+                    sourceY = (img.height - sourceHeight) / 2;
+                    newAspectRatio = "4 / 5"; // Ajusta a un aspect ratio de 4:5
+                }
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(
+                    img,
+                    sourceX,
+                    sourceY,
+                    sourceWidth,
+                    sourceHeight,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height,
+                );
+
+                canvas.toBlob(
+                    (blob) => {
+                        callback(blob, newAspectRatio);
+                    },
+                    "image/jpeg",
+                    quality,
+                );
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function uploadImageToFirebase() {
+        if (!resizedImageBlob) {
+            console.error("No hay imagen redimensionada para subir.");
+            return;
+        }
+
+        const uid = $userid;
+        const filenamePrefix = "resized-image";
+        const timestamp = new Date().getTime();
+        onPublish(true); // Activar el loader
+
+        try {
+            const downloadURL = await uploadImage(
+                uid,
+                "original" + uuidv4() + timestamp,
+                resizedImageBlob,
+            );
+            console.log("Imagen grande subida con éxito:", downloadURL);
+
+            const minidownloadURL = await uploadImage(
+                uid,
+                "thumb" + uuidv4() + timestamp,
+                resizedThumbImageBlob,
+            );
+            console.log("Imagen miniatura subida con éxito:", minidownloadURL);
+
+            const objectProduct = {
+                name: "NEW GPT",
+                description: "montro",
+                image: downloadURL,
+                thumbs: minidownloadURL,
+                aspectRatio: imageAspectRatio,
+                timestamp: serverTimestamp(),
+            };
+
+            const response = await createProduct(
+                `products/${uid}/userProducts`,
+                objectProduct,
+            );
+            
+            const updatedProduct = { ...objectProduct, id: response.id };
+
+            productList.update((currentProducts) => {
+                return [updatedProduct, ...currentProducts];
+            });
+        } catch (error) {
+            console.error("Error al subir la imagen:", error);
+        }
+
+        onPublish(false); // Desactivar el loader una vez todo ha finalizado
+    }
+
+    function onClose() {
+        if (imageUrl) {
+            imageUrl = "imageplaceholder.jpg";
+        }
+        dispatch("close");
+    }
+
+    function onPublish(loading) {
+        if (imageUrl) {
+            imageUrl = "imageplaceholder.jpg";
+        }
+        dispatch("publish", { showalert: loading });
     }
 </script>
 
