@@ -249,12 +249,13 @@
 {/if}
 
 <style>
+    
     .modal-backdrop {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 100vh;
         background-color: rgba(0, 0, 0, 1); /* Fondo semitransparente */
         display: flex;
         justify-content: center;
@@ -264,10 +265,11 @@
 
     .modal-content {
         /* flex: 1; */
+
         background-color: red;
         height: 100%;
+        overflow-y: auto;
        
-
     }
 
     .topbar {
