@@ -54,13 +54,14 @@
 
 
     function handleScroll() {
-        let threshold = scrollContainer.scrollHeight - (scrollContainer.clientHeight * 1); // Umbral antes de llegar al final
+        let threshold = scrollContainer.scrollHeight - (scrollContainer.clientHeight * 1.5); // Umbral antes de llegar al final
         if (scrollContainer.scrollTop >= threshold && !loadmoreAnimation) {
             console.log("Llegó al final del contenedor!");
             // Cargar más datos o realizar otra acción
         if($lastVisibletest != null){
             loadmoreAnimation = true;
-            handleLoadMore()
+             handleLoadMore()
+            console.log("asdasdasd")
         }
         }
     }
@@ -183,7 +184,7 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="modal-backdrop" on:click={close}>
-        <div class="modal-content" on:click|stopPropagation bind:this={scrollContainer} style="height: 100vh; overflow-y: auto;" >
+        <div class="modal-content" on:click|stopPropagation>
             <!-- <slot></slot>  -->
             <!-- <button on:click={close}>Close</button> -->
             <div class="topbar">
@@ -192,7 +193,7 @@
                 <button class="Add" on:click={toggleModal}>+</button>
             </div>
 
-            <div class="grid"  >
+            <div class="grid"  bind:this={scrollContainer} style="height: 100%; overflow-y: auto;" >
                 <!-- <button class="load-more-button" on:click={toggleModal}>+</button> -->
                 {#if runAnimation}
                     <button class="load-more-button">+</button>
