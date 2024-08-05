@@ -224,7 +224,7 @@
                     class="logo"
                     src={$productList[$productIndex].image}
                     alt="logo"
-                    on:click={() => fileInput.click()}
+                    
                     style="aspect-ratio: {$productList[$productIndex].aspectRatio}"
                 />
                 <textarea
@@ -249,24 +249,24 @@
 {/if}
 
 <style>
-    
     .modal-backdrop {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: auto;
+        height: 100%;
         background-color: rgba(0, 0, 0, 1); /* Fondo semitransparente */
         display: flex;
-        justify-content: center;
-        align-items: center;
+        /* justify-content: center; */
+        /* align-items: center; */
         z-index: 999; /* Asegúrate de que el modal esté sobre otros elementos */
     }
 
     .modal-content {
         /* flex: 1; */
-
-        /* background-color: red; */
+        display: flex;
+        flex-direction: column;
+        background-color: red;
         height: 100%;
         overflow-y: auto;
        
