@@ -1,12 +1,16 @@
 <script>
-    import { onMount, onDestroy,createEventDispatcher  } from "svelte";
-    import { browser } from "$app/environment";
-    import { serverTimestamp } from "firebase/firestore";
-    import { uploadImage, userid, loadMoreProducts } from "../../API";
+    import { onMount, onDestroy, createEventDispatcher } from "svelte";
+    import {
+        uploadImage,
+        userid,
+        loadMoreProducts,
+        deleteProduct,
+    } from "../../API";
     import {
         productList,
         productIndex,
         fullSizeImagesCache,
+        lastVisibletest,
     } from "../../stores/adminStore";
     import CreateProduct from "../Business/CreateProduct.svelte";
     import QuestionModal from "../QuestionModal.svelte";
@@ -28,19 +32,94 @@
 
     let runAnimation = false;
 
+    let loadmoreAnimation = false;
+
+    let scrollContainer;
+
     onMount(async () => {
         // const { products: initialProducts, lastVisible: newLastVisible } =
         //     await loadMoreProducts(null, $userid);
-
+        scrollContainer.addEventListener('scroll', handleScroll);
         // $productList = initialProducts.map(product => ({ ...product, opacity: 0 }));
         // lastVisible = newLastVisible;
         console.log($fullSizeImagesCache); // Verifica las referencias
-        // if (itemRefs[$productIndex]) {
-        //     setTimeout(() => {
-        //     itemRefs[$productIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
-        //     }, 0);
-        // }
+        if (itemRefs[$productIndex]) {
+            itemRefs[$productIndex].scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
     });
+
+    onDestroy(() => {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+    });
+
+
+    function handleScroll() {
+        let threshold = scrollContainer.scrollHeight - (scrollContainer.clientHeight * 1); // Umbral antes de llegar al final
+        if (scrollContainer.scrollTop >= threshold && !loadmoreAnimation) {
+            console.log("Llegó al final del contenedor!");
+            // Cargar más datos o realizar otra acción
+        if($lastVisibletest != null){
+            loadmoreAnimation = true;
+            handleLoadMore()
+        }
+        }
+    }
+
+
+    async function handleLoadMore() {
+        const { products: newProducts, lastVisible: newLastVisible } = await loadMoreProducts($lastVisibletest, $userid);
+        // $productList = newProducts.map((product) => ({...product,opacity: 0}));
+        $productList = [...$productList, ...newProducts];
+        $lastVisibletest = newLastVisible;
+        // productList.set($productList);
+        // preloadFullSizeImages(newProducts);
+         loadmoreAnimation = false;
+        // console.log(products);
+    }
+
+      //PRE-LOAD FULL IMAGE CACHE
+      function preloadFullSizeImages(products) {
+        products.forEach((product) => {
+            const img = new Image();
+            img.src = product.image; // Asume que `image` es la URL de la imagen de alta resolución
+            img.onload = () => {
+                fullSizeImagesCache.update((cache) => {
+                    cache[product.id] = img.src;
+                    return cache;
+                });
+                console.log(`Preloaded: ${img.src}`);
+            };
+        });
+    }
+
+
+  
+
+    async function handleDeleteProduct(productId) {
+        const uid = $userid;
+        const result = await deleteProduct(`products/${uid}/userProducts`,productId);
+
+        if (result) {
+
+            removeFromProductList(productId);
+            // removeFromImageCache(productId);
+            
+        }
+    }
+
+    function removeFromProductList(productId) {
+        productList.update((items) => {
+            return items.filter((item) => item.id !== productId);
+        });
+    }
+
+    function removeFromImageCache(productId) {
+        fullSizeImagesCache.update((cache) => {
+            const newCache = { ...cache };
+            delete newCache[productId]; // Elimina la entrada usando el ID del producto
+            return newCache;
+        });
+    }
 
     function toggleModal() {
         modalOpen = !modalOpen;
@@ -53,15 +132,18 @@
     }
 
     function eventHandler(index) {
-        // $productIndex = index;
+        $productIndex = index;
+        // console.log($productList[$productIndex].id)
         questionModalIsOpen = !questionModalIsOpen;
     }
 
     function toggleModalQuestion(event) {
         if (event.detail.object == "edit") {
         } else if (event.detail.object == "delete") {
+            handleDeleteProduct($productList[$productIndex].id);
         } else if (event.detail.object == "cancel") {
             questionModalIsOpen = !questionModalIsOpen;
+            console.log(event);
         }
         // openQuestionModal()
     }
@@ -79,17 +161,19 @@
 
     function handleImageLoaded(index) {
         if (itemRefs[$productIndex]) {
-            itemRefs[$productIndex].scrollIntoView({behavior: "auto",block: "start"});
+            // itemRefs[$productIndex].scrollIntoView({
+            //     behavior: "auto",
+            //     block: "start",
+            // });
             setTimeout(() => {
-               
                 $productList[index].opacity = 1; // Asegura que la imagen sea visible una vez cargada
                 productList.set($productList); // Actualiza el store para asegurar la reactividad
             }, 1000);
         }
     }
 
-    function onClose(){
-        dispatch("close")
+    function onClose() {
+        dispatch("close");
     }
 </script>
 
@@ -108,29 +192,28 @@
                 <button class="Add" on:click={toggleModal}>+</button>
             </div>
 
-            <div class="grid">
+            <div class="grid"  bind:this={scrollContainer} style="height: 100%; overflow-y: auto;" >
                 <!-- <button class="load-more-button" on:click={toggleModal}>+</button> -->
                 {#if runAnimation}
                     <button class="load-more-button">+</button>
                 {/if}
                 {#each $productList as image, index}
-     
                     <div class="image-cell" bind:this={itemRefs[index]}>
-                     
-                         <div class="cellheader">
-                           
-                         </div>
-                        
+                        <div class="cellheader"></div>
+                        <!-- {$fullSizeImagesCache[image.id] -->
                         <img
-                            src={$fullSizeImagesCache[image.id]}
+                            src={image.image}
                             on:load={() => handleImageLoaded(index)}
                             on:click={() => eventHandler(index)}
                             style="opacity: {image.opacity}; aspect-ratio: {image.aspectRatio}"
-                            
                             alt="Imagen descriptiva"
                         />
                     </div>
                 {/each}
+                {#if loadmoreAnimation}
+                <button style="height: 25px;">loading</button> 
+                {/if}
+               
                 <!-- <div class="image-cell"  bind:this={itemRefs[$productIndex]}>
                  
                      <div class="cellheader">
@@ -216,6 +299,7 @@
             1fr
         ); /* 3 columnas en todas las resoluciones */
         gap: 2px;
+        overflow-y: auto;
     }
 
     .image-cell {
@@ -224,12 +308,14 @@
         align-items: center; /* Centra verticalmente */
         justify-content: center; /* Centra horizontalmente */
         /* height: auto; */
+        width: 100%;
+        min-width: 360px;
         background-color: #e90d0d;
-        aspect-ratio: auto;
+        /* aspect-ratio: 1/1; */
         scroll-margin-top: 60px;
     }
 
-    .cellheader{
+    .cellheader {
         height: 60px;
     }
 

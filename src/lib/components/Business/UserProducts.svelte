@@ -1,6 +1,6 @@
 <script>
     import { onMount, onDestroy, createEventDispatcher } from "svelte";
-    import { userid, loadMoreProducts } from "../../API";
+    import { userid, loadMoreProducts ,firstLoadProduct} from "../../API";
     import {
         productList,
         productIndex,
@@ -35,15 +35,15 @@
     //LOAD PRODUCT + ORIGINAL IMAGE CACHE
     onMount(async () => {
         if ($productList.length == 0) {
-            const { products: initialProducts, lastVisible: newLastVisible } =
-                await loadMoreProducts(null, $userid);
+            const { products: initialProducts, lastVisible: newLastVisible} = await firstLoadProduct($userid);
             $productList = initialProducts.map((product) => ({
                 ...product,
                 opacity: 1,
             }));
             lastVisible = newLastVisible;
             $lastVisibletest = newLastVisible
-            preloadFullSizeImages();
+            console.log(newLastVisible)
+            // preloadFullSizeImages();
         }
     });
 
@@ -173,12 +173,14 @@
                         />
                     </div>
                 {/each}
+                
                 <button class="load-more-button" on:click={handleLoadMore}
                     >+</button
                 >
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
             </div>
+            <button>asdasdas</button> 
         </div>
     </div>
 

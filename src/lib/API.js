@@ -1,13 +1,42 @@
 import { writable,get  } from "svelte/store";
 import { db, auth,storage } from "$lib/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { serverTimestamp,doc, setDoc, addDoc, getDoc, getDocs, collection, query, orderBy,where,startAfter,limit } from "firebase/firestore";
+import { serverTimestamp,doc, setDoc, addDoc, getDoc, getDocs, collection, query, orderBy,where,startAfter,limit,deleteDoc  } from "firebase/firestore";
 import { uploadBytes,getDownloadURL,ref} from "firebase/storage";
 import { description } from "./stores/adminStore";
 
 
 export const userid = writable('');
 
+export async function firstLoadProduct(userID){
+    const productsRef = collection(db, "products/"+userID+"/userProducts");
+    // console.log(productsRef)
+    let queryRef;
+
+    // Establece el límite de documentos a recuperar en cada solicitud
+    const LIMIT = 4;
+
+    queryRef = query(productsRef, orderBy("timestamp","desc"), limit(LIMIT));
+
+    try {
+        const documentSnapshots = await getDocs(queryRef);
+  
+        // Si no hay documentos, has llegado al final de la colección
+        if (documentSnapshots.empty) {
+          console.log("No more documents available.");
+          return { products: [], lastVisible: null };
+        }
+  
+        const lastVisibleDocument = documentSnapshots.docs[documentSnapshots.docs.length - 1];
+        const products = documentSnapshots.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Devuelve los productos y el último documento visible si aún hay documentos
+        return { products, lastVisible: lastVisibleDocument };
+      } catch (error) {
+        console.error("Error cargando más productos: ", error);
+        return { products: [], lastVisible: null };
+      }
+}
 
 export async function loadMoreProducts(lastVisible, userID) {
     const productsRef = collection(db, "products/"+userID+"/userProducts");
@@ -15,14 +44,11 @@ export async function loadMoreProducts(lastVisible, userID) {
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 6;
+    const LIMIT = 4;
 
     if (lastVisible) {
       // Si hay un documento visible de la última carga, empieza después de ese documento
       queryRef = query(productsRef, orderBy("timestamp","desc"), startAfter(lastVisible), limit(LIMIT));
-    } else {
-      // Si no hay un documento visible (primera carga), simplemente aplica el límite
-      queryRef = query(productsRef, orderBy("timestamp","desc"), limit(LIMIT));
     }
 
     try {
@@ -36,7 +62,7 @@ export async function loadMoreProducts(lastVisible, userID) {
 
       const lastVisibleDocument = documentSnapshots.docs[documentSnapshots.docs.length - 1];
       const products = documentSnapshots.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
+      
       // Devuelve los productos y el último documento visible si aún hay documentos
       return { products, lastVisible: lastVisibleDocument };
     } catch (error) {
@@ -206,6 +232,18 @@ export const createProduct = async (collectionURL,objectProduct) => {
       return { success: false, error: error }; // Retorna false y el error si hubo un error
     }
   };
+//REMOVE PRODUCT
+export async function deleteProduct(collectionURL, productId) {
+    const docRef = doc(db,collectionURL, productId);
+    try {
+        await deleteDoc(docRef);
+        console.log("Documento eliminado con éxito");
+        return true;
+    } catch (error) {
+        console.error("Error eliminando documento: ", error);
+        return false;
+    }
+}
 
 
 
