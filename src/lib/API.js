@@ -14,7 +14,7 @@ export async function firstLoadProduct(userID){
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 4;
+    const LIMIT = 24;
 
     queryRef = query(productsRef, orderBy("timestamp","desc"), limit(LIMIT));
 
@@ -44,7 +44,7 @@ export async function loadMoreProducts(lastVisible, userID) {
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 4;
+    const LIMIT = 1;
 
     if (lastVisible) {
       // Si hay un documento visible de la última carga, empieza después de ese documento

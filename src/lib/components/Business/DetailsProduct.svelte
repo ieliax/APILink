@@ -1,5 +1,6 @@
 <script>
     import { onMount, onDestroy, createEventDispatcher } from "svelte";
+    
     import {
         uploadImage,
         userid,
@@ -14,6 +15,9 @@
     } from "../../stores/adminStore";
     import CreateProduct from "../Business/CreateProduct.svelte";
     import QuestionModal from "../QuestionModal.svelte";
+    import PostHeader from "../PostComponent/PostHeader.svelte";
+    import PostComment from "../PostComponent/PostComment.svelte";
+    import EditProducts from "./EditProducts.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -140,6 +144,8 @@
 
     function toggleModalQuestion(event) {
         if (event.detail.object == "edit") {
+            modalOpen = !modalOpen;
+            questionModalIsOpen = !questionModalIsOpen;
         } else if (event.detail.object == "delete") {
             handleDeleteProduct($productList[$productIndex].id);
         } else if (event.detail.object == "cancel") {
@@ -200,15 +206,18 @@
                 {/if}
                 {#each $productList as image, index}
                     <div class="image-cell" bind:this={itemRefs[index]}>
-                        <div class="cellheader"></div>
+                        <!-- <div class="cellheader"></div> -->
                         <!-- {$fullSizeImagesCache[image.id] -->
+                         <PostHeader  on:edit={() => eventHandler(index)}/>
                         <img
                             src={image.image}
                             on:load={() => handleImageLoaded(index)}
-                            on:click={() => eventHandler(index)}
+                            
                             style="opacity: {image.opacity}; aspect-ratio: {image.aspectRatio}"
                             alt="Imagen descriptiva"
                         />
+                        <PostComment textoCompleto="After spending 5 hours trying to figure it out, finally here's the simplest way to use Fontawesome icons in Sveltekit (also works in production environment):"
+                        maxCaracteres={100}/>
                     </div>
                 {/each}
                 {#if loadmoreAnimation}
@@ -240,7 +249,14 @@
         on:close={toggleModal}
         on:publish={gridLoadingAnimation}
     ></CreateProduct> -->
-
+    {#if modalOpen}
+    <EditProducts
+        isOpen={modalOpen}
+        on:close={toggleModal}
+        on:publish={gridLoadingAnimation}/>
+        
+    {/if}
+    
     <QuestionModal
         isOpen={questionModalIsOpen}
         on:close1={toggleModalQuestion}
@@ -262,7 +278,9 @@
     }
 
     .modal-content {
-        flex: 1;
+        /* flex: 1; */
+        display: flex;
+        flex-direction: column;
         /* background-color: red; */
         height: 100%;
         /* overflow-y: auto;   */
@@ -299,8 +317,9 @@
             1,
             1fr
         ); /* 3 columnas en todas las resoluciones */
-        gap: 2px;
+        gap: 0px;
         overflow-y: auto;
+        
     }
 
     .image-cell {
@@ -311,9 +330,9 @@
         /* height: auto; */
         width: 100%;
         min-width: 360px;
-        background-color: #e90d0d;
+        background-color: white;
         /* aspect-ratio: 1/1; */
-        scroll-margin-top: 60px;
+        /* scroll-margin-top: 50px; */
     }
 
     .cellheader {
