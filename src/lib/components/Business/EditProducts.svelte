@@ -264,8 +264,8 @@
 
     .modal-content {
         /* flex: 1; */
-        /* background-color: red; */
-        height: 100%;
+        background-color: red;
+        height: auto;
 
     }
 
