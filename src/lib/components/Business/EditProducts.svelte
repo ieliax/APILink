@@ -265,7 +265,8 @@
     .modal-content {
         /* flex: 1; */
         background-color: red;
-        height: auto;
+        height: 100%;
+        overflow-y: auto;
 
     }
 
@@ -300,7 +301,7 @@
         /* height: auto; */
         /* width: auto; */
         min-width: 360px;
-        overflow-y: auto;
+       
         overflow-x: hidden;
         /* overflow-x: hidden; */
         /* background-color: white; */
