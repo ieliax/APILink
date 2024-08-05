@@ -266,8 +266,7 @@
         /* flex: 1; */
         /* background-color: red; */
         height: 100%;
-       
-        overflow-x: hidden;
+
     }
 
     .topbar {
@@ -302,6 +301,7 @@
         /* width: auto; */
         min-width: 360px;
         overflow-y: auto;
+        overflow-x: hidden;
         /* overflow-x: hidden; */
         /* background-color: white; */
         /* aspect-ratio: 1/1; */
