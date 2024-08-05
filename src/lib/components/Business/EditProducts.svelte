@@ -266,7 +266,7 @@
         /* flex: 1; */
         background-color: red;
         height: 100%;
-        overflow-y: auto;
+       
 
     }
 
