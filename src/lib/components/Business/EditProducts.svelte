@@ -1,37 +1,31 @@
 <script>
-    import { onMount } from "svelte";
-    import { browser } from '$app/environment';
+    import { onMount, onDestroy } from "svelte";
+    import { browser } from '$app/environment';  // Asegúrate de usar la importación correcta aquí
 
     let myTextarea;
     let keyboardPadding = 0; // Almacenar el padding del teclado
 
- 
-
     // Ajustar el padding según el cambio de altura de la ventana
     function adjustPadding() {
         const originalHeight = window.innerHeight;
-        return () => {
+        window.addEventListener("resize", () => {
             const currentHeight = window.innerHeight;
             keyboardPadding = originalHeight - currentHeight > 100 ? originalHeight - currentHeight : 0;
-        };
+        });
     }
 
     if (browser) {
         onMount(() => {
             if (myTextarea) {
-            myTextarea.focus();
-        }
-            window.addEventListener("resize", adjustPadding);
+                myTextarea.focus();
+            }
             adjustPadding(); // Verificar inmediatamente en la carga de la página
+        });
 
-            return () => {
-                window.removeEventListener("resize", adjustPadding);
-            };
+        onDestroy(() => {
+            window.removeEventListener("resize", adjustPadding);
         });
     }
-
-    // Limpiar el listener al destruir el componente
-
 </script>
 
 <div class="overlay" style="padding-bottom: {keyboardPadding}px;">
@@ -60,6 +54,10 @@
     }
 
     .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
         height: 50px;
         background-color: red;
     }
@@ -82,9 +80,10 @@
         width: 100%;
     }
 
-    .content button{
-        height: 600px;
+    .content button {
+        height: 600px;  
     }
+
     .content textarea {
         height: 80px;
     }
