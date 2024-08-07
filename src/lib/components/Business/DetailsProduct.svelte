@@ -250,6 +250,7 @@
         on:publish={gridLoadingAnimation}
     ></CreateProduct> -->
     {#if modalOpen}
+    
     <EditProducts
         isOpen={modalOpen}
         on:close={toggleModal}

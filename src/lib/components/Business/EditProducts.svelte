@@ -1,9 +1,9 @@
 <script>
     import { onMount, onDestroy } from "svelte";
-    import { browser } from '$app/environment';  // Asegúrate de usar la importación correcta aquí
+    import { browser } from '$app/environment';
 
     let myTextarea;
-    let keyboardPadding = 0; // Almacenar el padding del teclado
+    let keyboardPadding = 0; // Padding dinámico para cuando el teclado esté visible
 
     // Ajustar el padding según el cambio de altura de la ventana
     function adjustPadding() {
@@ -51,23 +51,28 @@
         background-color: #333;
         color: white;
         z-index: 1000;
+        padding-top: 50px; /* Altura del header */
     }
 
     .header {
-        position: sticky;
+        position: fixed; /* Cambiado de 'sticky' a 'fixed' */
         top: 0;
         left: 0;
         width: 100%;
         height: 50px;
         background-color: red;
+        z-index: 1010; /* Asegurar que el header esté sobre otros contenidos */
     }
 
     .container {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: calc(100% - 50px); /* Ajustado para no estar detrás del header */
         background-color: aqua;
         overflow-y: auto;
+        position: absolute;
+        top: 50px; /* Iniciar debajo del header */
+        width: 100%;
     }
 
     .content {
@@ -81,7 +86,7 @@
     }
 
     .content button {
-        height: 600px;  
+        height: 600px;
     }
 
     .content textarea {
