@@ -18,7 +18,7 @@
 
     let myTextarea;
 
-    let imageUrl = "imageplaceholder.jpg";
+    let imageUrl = "https://scontent.fhex5-2.fna.fbcdn.net/v/t39.30808-6/454320490_923382769828671_7321421350572642750_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEXQMglHax9FV0wNg94PZ-C_VCaOm9EN6_9UJo6b0Q3r4i4rMFtDwPPzh_GpU1SK_Zm1iAbWHwrfZR5jZLQiVBb&_nc_ohc=2uuR0QLwJkwQ7kNvgFSf_R9&_nc_ht=scontent.fhex5-2.fna&oh=00_AYANLeQSQ62bxZSvbTRb5L1wfxdTSItq7vwydRiNKesuSA&oe=66BB007A";
     let resizedImageBlob;
     let resizedThumbImageBlob;
 
@@ -226,13 +226,13 @@
                             placeholder="Si el usuario pregunta por ubicacion">
                         </textarea>
                         <div class="answer">
-                            <!-- <img 
+                            <img 
                             class="logo"
                             src={imageUrl}
                             alt="logo"
                             on:click={() => fileInput.click()}
                             style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
-                            /> -->
+                            />
                             <!-- <i class="fa-regular fa-image"></i> -->
                             <div class="answer-footer">
                                 <p>starbucks</p>
@@ -268,7 +268,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 1); /* Fondo semitransparente */
+        background-color: #212121; /* Fondo semitransparente */
         display: flex;
         justify-content: center;
         align-items: center;
@@ -293,8 +293,9 @@
         position: sticky;
         top: 0;
         grid-template-columns: 0.1fr 1fr 0.1fr;
-        background-color: rebeccapurple;
+        /* background-color: rebeccapurple; */
         height: 60px;
+        border-bottom: 1px solid #E3E3E3;
         
     }
     .title{
@@ -306,7 +307,9 @@
   
     .topbar button {
         width: 60px;
-        background-color: greenyellow;
+        background-color: #212121;
+        border: none;
+        color: white;
     }
 
     .messagebox__container {
@@ -362,7 +365,7 @@
     .answer{
         display: flex;
         flex-direction: column;
-        border: 1px solid #ccc;
+        border: 1px solid #cccccc67;
         width: 100%;
         /* height: 350px; */
         /* background-color: red; */
