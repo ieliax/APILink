@@ -40,10 +40,16 @@
   
   *{
     color: black;
+    margin: 0;
+    padding: 0;
   }
     .container{
-        margin-left: 10px;
-        background-color: white;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      margin-left: 20px;
+      background-color: white;
+      width: 100%;
+        /* background-color: red; */
     }
 
     .more {

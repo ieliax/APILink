@@ -10,3 +10,5 @@ export const productList = writable([]);
 export const lastVisibletest = writable(null);
 export const fullSizeImagesCache = writable([]);
 export const productIndex = writable()
+
+export const runGridAnimation = writable(false);

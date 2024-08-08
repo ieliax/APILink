@@ -21,7 +21,7 @@ export const gptanalizer = writable(`
 export const openaiList = writable(`
     {
         "id":"assistant",
-        "text":"",
+        "text":"ssss",
         "action":"crossSell",
         "items": [
         {

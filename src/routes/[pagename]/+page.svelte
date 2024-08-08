@@ -72,7 +72,7 @@
                     }, 1000);
                 } else if (analizeResponse.model == "CreateProductGPT") {
                     let response = JSON.parse($openaiList);
-                    console.log(response.items);
+                    console.log(response.text);
                     setTimeout(async () => {
                         // messages = [...messages,{text: "¡Respuesta automática!",role: "assistant"}];
                         messagelist.update((m) => [
@@ -187,11 +187,15 @@
                                     crossell={message.itemList}
                                 />
                             {:else if message.model == "CreateProductGPT"}
-                                <GptShowProductbox
+                                <!-- <GptShowProductbox
                                     role={message.role}
                                     message={message.text}
                                     crossell={message.itemList}
-                                />
+                                /> -->
+                                <GptMessagebox
+                                role={message.role}
+                                message={message.text}
+                            />
                             {/if}
                         {:else if message.role == "user"}
                             <!-- {l.content} -->

@@ -1,7 +1,7 @@
 import { writable,get  } from "svelte/store";
 import { db, auth,storage } from "$lib/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { serverTimestamp,doc, setDoc, addDoc, getDoc, getDocs, collection, query, orderBy,where,startAfter,limit,deleteDoc  } from "firebase/firestore";
+import { serverTimestamp,doc, setDoc, addDoc, getDoc, getDocs, collection, query, orderBy,where,startAfter,limit,deleteDoc,updateDoc  } from "firebase/firestore";
 import { uploadBytes,getDownloadURL,ref} from "firebase/storage";
 import { description } from "./stores/adminStore";
 
@@ -14,7 +14,7 @@ export async function firstLoadProduct(userID){
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 24;
+    const LIMIT = 18;
 
     queryRef = query(productsRef, orderBy("timestamp","desc"), limit(LIMIT));
 
@@ -44,7 +44,7 @@ export async function loadMoreProducts(lastVisible, userID) {
     let queryRef;
 
     // Establece el límite de documentos a recuperar en cada solicitud
-    const LIMIT = 1;
+    const LIMIT = 18;
 
     if (lastVisible) {
       // Si hay un documento visible de la última carga, empieza después de ese documento
@@ -245,6 +245,25 @@ export async function deleteProduct(collectionURL, productId) {
     }
 }
 
+
+
+// Función para crear o actualizar un producto
+export const updateProduct = async (collectionURL, objectProduct, docId) => {
+    let docRef = doc(db, collectionURL, docId);
+        try {
+            await updateDoc(docRef, objectProduct);
+            return { success: true, id: docRef.id }; // Retorna true y el ID del documento actualizado
+        } catch (error) {
+            console.error("Error al actualizar el documento:", error);
+            return { success: false, error: error };
+        }
+};
+
+// Uso de la función saveProduct para crear un nuevo producto
+// saveProduct("productos", { nombre: "Producto Nuevo", precio: 10 });
+
+// Uso de la función saveProduct para actualizar un producto existente
+// saveProduct("productos", { nombre: "Producto Actualizado", precio: 20 }, "idDelDocumento");
 
 
 

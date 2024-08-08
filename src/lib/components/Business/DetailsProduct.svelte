@@ -37,7 +37,6 @@
     let runAnimation = false;
 
     let loadmoreAnimation = false;
-
     let scrollContainer;
 
     onMount(async () => {
@@ -143,12 +142,12 @@
     }
 
     function toggleModalQuestion(event) {
-        if (event.detail.object == "edit") {
+        if (event.detail.tag == "edit") {
             modalOpen = !modalOpen;
             questionModalIsOpen = !questionModalIsOpen;
-        } else if (event.detail.object == "delete") {
+        } else if (event.detail.tag == "delete") {
             handleDeleteProduct($productList[$productIndex].id);
-        } else if (event.detail.object == "cancel") {
+        } else if (event.detail.tag == "cancel") {
             questionModalIsOpen = !questionModalIsOpen;
             console.log(event);
         }
@@ -196,10 +195,10 @@
             <div class="topbar">
                 <button class="Add" on:click={onClose}></button>
                 <p>Product</p>
-                <button class="Add" on:click={toggleModal}>+</button>
+                <!-- <button class="Add" on:click={toggleModal}>+</button> -->
             </div>
 
-            <div class="grid"  bind:this={scrollContainer} style="height: 100%; overflow-y: auto;" >
+            <div class="grid" bind:this={scrollContainer} style="height: 100%; overflow-y: auto;" >
                 <!-- <button class="load-more-button" on:click={toggleModal}>+</button> -->
                 {#if runAnimation}
                     <button class="load-more-button">+</button>
@@ -216,7 +215,8 @@
                             style="opacity: {image.opacity}; aspect-ratio: {image.aspectRatio}"
                             alt="Imagen descriptiva"
                         />
-                        <PostComment textoCompleto="After spending 5 hours trying to figure it out, finally here's the simplest way to use Fontawesome icons in Sveltekit (also works in production environment):"
+                        <PostComment
+                        textoCompleto={image.description}
                         maxCaracteres={100}/>
                     </div>
                 {/each}
@@ -260,6 +260,7 @@
     
     <QuestionModal
         isOpen={questionModalIsOpen}
+        questionList={ [{object:"Delete",tag:"delete"},{object:"Edit",tag:"edit"},{object:"Cancel",tag:"cancel"}]}
         on:close1={toggleModalQuestion}
     />
 {/if}

@@ -5,12 +5,15 @@
         productList,
         productIndex,
         fullSizeImagesCache,
-        lastVisibletest
+        lastVisibletest,
+        runGridAnimation
     } from "../../stores/adminStore";
 
     import CreateProduct from "../Business/CreateProduct.svelte";
     import QuestionModal from "../QuestionModal.svelte";
     import DetailsProduct from "./DetailsProduct.svelte";
+    import UiProfileComponent from "../ProfileComponent/UIProfileComponent.svelte";
+    import Slider from "../ProfileComponent/Slider.svelte";
 
     //EVENT DISPATCHER
     const dispatch = createEventDispatcher();
@@ -32,8 +35,17 @@
 
     let runAnimation = false;
 
+    let loadmoreAnimation = false;
+    let scrollContainer;
+
     //LOAD PRODUCT + ORIGINAL IMAGE CACHE
     onMount(async () => {
+        // scrollContainer.addEventListener('scroll', handleScroll);
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', handleScroll);
+            
+        }
+        // console.log("asasas")
         if ($productList.length == 0) {
             const { products: initialProducts, lastVisible: newLastVisible} = await firstLoadProduct($userid);
             $productList = initialProducts.map((product) => ({
@@ -47,6 +59,31 @@
         }
     });
 
+
+    function handleScroll() {
+        let threshold = scrollContainer.scrollHeight - (scrollContainer.clientHeight * 1.5); // Umbral antes de llegar al final
+        if (scrollContainer.scrollTop >= threshold && !loadmoreAnimation) {
+            console.log("Llegó al final del contenedor!");
+            // Cargar más datos o realizar otra acción
+        if($lastVisibletest != null){
+            loadmoreAnimation = true;
+             handleLoadMore()
+            console.log("asdasdasd")
+        }
+        }
+    }
+
+
+    async function handleLoadMore() {
+        const { products: newProducts, lastVisible: newLastVisible } = await loadMoreProducts($lastVisibletest, $userid);
+        // $productList = newProducts.map((product) => ({...product,opacity: 0}));
+        $productList = [...$productList, ...newProducts];
+        $lastVisibletest = newLastVisible;
+        // productList.set($productList);
+        // preloadFullSizeImages(newProducts);
+         loadmoreAnimation = false;
+        // console.log(products);
+    }
     
     //     function preloadFullSizeImages(products = $productList) {
     //     products.forEach(product => {
@@ -78,16 +115,16 @@
     }
 
     //LOAD MORE PRODUCTO
-    async function handleLoadMore() {
-        const { products: newProducts, lastVisible: newLastVisible } =
-            await loadMoreProducts($lastVisibletest, $userid);
-        // $productList = newProducts.map((product) => ({...product,opacity: 0}));
-        $productList = [...$productList, ...newProducts];
-        $lastVisibletest = newLastVisible;
-        // productList.set($productList);
-        preloadFullSizeImages();
-        // console.log(products);
-    }
+    // async function handleLoadMore() {
+    //     const { products: newProducts, lastVisible: newLastVisible } =
+    //         await loadMoreProducts($lastVisibletest, $userid);
+    //     // $productList = newProducts.map((product) => ({...product,opacity: 0}));
+    //     $productList = [...$productList, ...newProducts];
+    //     $lastVisibletest = newLastVisible;
+    //     // productList.set($productList);
+    //     preloadFullSizeImages();
+    //     // console.log(products);
+    // }
 
     //IMAGE ON COMPLETE
     function handleImageLoad(index) {
@@ -97,7 +134,7 @@
         $productList[index].opacity = 1; // Cambia la opacidad a 1 después de la carga
         // Actualiza el store para reactividad
         // console.log($productList[index]);
-        console.log($lastVisibletest);
+         console.log($lastVisibletest);
         // $productList = $productList.map((product) => ({ ...product }));
         // }, 500); // Retraso de 1 segundo
     }
@@ -119,8 +156,8 @@
 
     function gridLoadingAnimation(event) {
         isOpenCreateProductModal = false;
-        preloadFullSizeImages() 
-        runAnimation = event.detail.showalert;
+        // preloadFullSizeImages() 
+        $runGridAnimation = event.detail.showalert;
         console.log($productList,"producto");
     }
 
@@ -146,18 +183,21 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="modal-backdrop" on:click={close}>
-        <div class="modal-content" on:click|stopPropagation>
+        
+        <div class="modal-content" on:click|stopPropagation bind:this={scrollContainer}  style="overflow-y: auto; height: 100%;">
             <!-- <slot></slot>  -->
+             
             <!-- <button on:click={close}>Close</button> -->
             <div class="topbar">
                 <button class="Add" on:click={closeUserProductModal}>x</button>
                 <p>Product</p>
                 <button class="Add" on:click={toggleCreateProductModal}>+</button>
             </div>
-
-            <div class="grid">
+            <!-- <UiProfileComponent/> -->
+            <!-- <Slider/> -->
+            <div class="grid" >
                 <!-- <button class="load-more-button" on:click={toggleModal}>+</button> -->
-                {#if runAnimation}
+                {#if $runGridAnimation}
                     <button class="load-more-button">+</button>
                 {/if}
                 {#each $productList as image, index}
@@ -183,13 +223,14 @@
             <button>asdasdas</button> 
         </div>
     </div>
-
+    
     {#if isOpenCreateProductModal}
         <CreateProduct
             isOpen={isOpenCreateProductModal}
             on:close={toggleCreateProductModal}
             on:publish={gridLoadingAnimation}/>
     {/if}
+   
 
     {#if modalOpenDetailsProduct}
         <DetailsProduct
@@ -203,27 +244,31 @@
         isOpen={questionModalIsOpen}
         on:close1={toggleModalQuestion}
     />
+    
 {/if}
 
 <style>
+    *{
+        /* margin: 0; */
+    }
     .modal-backdrop {
-        position: fixed;
+        /* position: fixed;
         top: 0;
-        left: 0;
+        left: 0; */
         width: 100%;
         height: 100%;
         background-color: #212121;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        /* justify-content: center; */
+        /* align-items: center; */
         z-index: 999; /* Asegúrate de que el modal esté sobre otros elementos */
     }
 
     .modal-content {
         flex: 1;
         /* background-color: red; */
-        height: 100%;
-        overflow-y: auto;
+        /* height: 100%;
+        overflow-y: auto; */
     }
 
     .topbar {
@@ -258,6 +303,7 @@
             1fr
         ); /* 3 columnas en todas las resoluciones */
         gap: 2px;
+        overflow-y: auto;
     }
 
     .image-cell {

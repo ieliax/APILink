@@ -4,6 +4,8 @@
     export let close; // Función para cerrar el modal
     const dispatch = createEventDispatcher();
 
+    export let questionList = []
+
     function onClose(event){
         dispatch("close1")
         console.log("asdasdasd")
@@ -24,8 +26,9 @@
        
     }
 
-    export function elias(){
-        console.log("tamo dentro")
+    export function elias(event){
+        // console.log(event.target.id)
+        dispatch("close1",{tag:event.target.id})
     }
 
     // init()
@@ -46,10 +49,13 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button>asas</button>
+                {#each questionList as question}
+                <button id={question.tag} on:click={elias}>{question.object}</button>
+                {/each}
+                <!-- <button>asas</button>
                 <button on:click={onClickEdit}>Editar</button>
                 <button on:click={onClickDelete}>Eliminar</button>
-                <button on:click={onClickCancel}>Cancelar</button>
+                <button on:click={onClickCancel}>Cancelar</button> -->
             </div>
         </div>
     </div>

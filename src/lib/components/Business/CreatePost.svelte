@@ -17,6 +17,7 @@
     let fileInput;
 
     let myTextarea;
+    let myTextareaAnswer;
 
     let imageUrl = "imageplaceholder.jpg";
     let resizedImageBlob;
@@ -26,17 +27,29 @@
 
     onMount(() => {
         // window.addEventListener('resize', adjustTextareaHeight);
+        myTextarea.value = "";
+        myTextareaAnswer.value = "";
         adjustTextareaHeight();
         console.log(window.innerWidth);
+        
         // fileInput.addEventListener("change", handleFileChange);
     });
 
     function adjustTextareaHeight() {
         // Establecer altura automáticamente basada en el contenido
         if (myTextarea) {
+            
             myTextarea.style.height = "auto";
             myTextarea.style.height = `${myTextarea.scrollHeight - 10}px`;
             // console.log(window)
+            
+        }
+        if (myTextareaAnswer) {
+            
+            // myTextareaAnswer.style.height = "auto";
+            // myTextareaAnswer.style.height = `${myTextareaAnswer.scrollHeight - 10}px`;
+            // console.log(window)
+            
         }
     }
 
@@ -201,44 +214,60 @@
             <!-- <button on:click={close}>Close</button> -->
             <div class="topbar">
                 <button on:click={() => onClose(true)}>close</button>
-                <p>Create Product</p>
+                <div class="title">
+                    <p>Create Product</p>
+                </div>
                 <button on:click={uploadImageToFirebase}>publicar</button>
             </div>
             <div class="container">
-                <div class="content">
-                    <!-- <h5>{$nickname}</h5>
-                    <p>@{$pagename}</p> -->
+
+                <div class="messagebox">
+                    <div class="messagebox__container">
+                       
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/640px-Starbucks_Corporation_Logo_2011.svg.png" alt="" />
+                        <div class="messagebox__container-message" >
+                            <p>starbucks</p>
+                            <textarea name="" 
+                            bind:this={myTextarea} 
+                            on:input={adjustTextareaHeight} 
+                            placeholder="Si el usuario pregunta por ubicacion">
+                        </textarea>
+                        <div class="answer">
+                            <img 
+                            class="logo"
+                            src={imageUrl}
+                            alt="logo"
+                            on:click={() => fileInput.click()}
+                            style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
+                            />
+                            <!-- <i class="fa-regular fa-image"></i> -->
+                            <div class="answer-footer">
+                                <p>starbucks</p>
+                                <!-- 서로 다른 컬러와 패턴의 아이템이 하나의 룩으로 어우러질 때의 멋은 그 무엇과도 비교하기 어렵습니다 -->
+                                <textarea name="" 
+                            bind:this={myTextareaAnswer} 
+                            on:input={adjustTextareaHeight} 
+                            placeholder="Si el usuario pregunta por ubicacion">
+                        </textarea>
+                            </div>
+                        </div>
+                        </div>
+                
+                    </div>
                 </div>
 
-                <img
-                    class="logo"
-                    src={imageUrl}
-                    alt="logo"
-                    on:click={() => fileInput.click()}
-                    style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
-                />
                 
-                <textarea
-                    name=""
-                    bind:this={myTextarea}
-                    on:input={adjustTextareaHeight}
-                    placeholder="¡Genial! Has elegido la Pizza Margarita Clásica, una pizza tradicional con salsa de tomate fresco, mozzarella y albahaca, horneada a la perfección, y en oferta de 2x1. Para completar tu compra, te recomiendo considerar nuestros Palitos de Mozzarella y una Ensalad"
-                ></textarea>
 
-                <input
-                    type="file"
-                    id="fileInput"
-                    bind:this={fileInput}
-                    on:change={handleFile}
-                    accept="image/*"
-                    hidden
-                />
             </div>
         </div>
     </div>
 {/if}
 
 <style>
+
+    *{
+        margin: 0;
+    }
     .modal-backdrop {
         position: fixed;
         top: 0;
@@ -272,55 +301,115 @@
         grid-template-columns: 0.1fr 1fr 0.1fr;
         background-color: rebeccapurple;
         height: 60px;
+        
     }
-    .topbar p {
-        background-color: red;
-        text-align: center;
+    .title{
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
     }
+  
     .topbar button {
         width: 60px;
         background-color: greenyellow;
     }
 
-    .container img {
-        width: 100%;
-        height: auto;
-        display: block;
-        border-radius: 5px;
-        object-fit: cover;
-        /* aspect-ratio: 4 / 5; */
-        /* margin-left: 10px; */
-        /* margin: 10px; */
+    .messagebox__container {
+        display: flex;
+        flex-direction: row;
+        /* background-color: aqua; */
+        gap: 10px;
+        /* height: auto; */
+        margin-bottom: 20px;
+        margin: 10px;
+        
     }
-    .container textarea {
-        font-family:
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            "Open Sans",
-            "Helvetica Neue",
-            sans-serif;
-        font-size: 16px;
+
+    .messagebox__container img {
+        width: 40px;    
+        height: 40px;   
+        object-fit: cover;
+        
+    }
+    
+
+    .messagebox__container-message {
+        /* line-height: 22px; */
+        display: flex;
+        flex-direction: column;
+        /* background-color: rosybrown; */
+        width: 100%;
+        margin-right: 10px;
+    }
+    .messagebox__container-message p{
+        font-family: Roboto;
+        font-size: 15px;
+    }
+    .messagebox__container-message textarea {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 15px;
         width: 100%;
         resize: none;
         overflow-y: hidden;
         outline: none;
         border: none;
-        color: #e3e3e3;
+        color: #E3E3E3;
         background-color: transparent;
         /* align-content: center; */
         margin-top: 0px;
         line-height: 25px;
-        /* overflow-y: auto; */
         /* line-height: 25px; */
         /* padding: 5px; */
         /* box-sizing: border-box; */
         /* padding: 10px; */
+    }
+
+    .answer{
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ccc;
+        width: 100%;
+        /* height: 350px; */
+        /* background-color: red; */
+        /* border-radius: 10px; */
+        border-radius: 10px;
+    }
+
+    .answer-footer{
+        margin: 20px;
+
+    }
+    .answer-footer p{
+        font-family: Roboto;
+        font-size: 12px;
+    }
+    .answer-footer textarea{
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 15px;
+        width: 100%;
+        resize: none;
+        overflow-y: hidden;
+        outline: none;
+        border: none;
+        color: #E3E3E3;
+        background-color: transparent;
+        /* align-content: center; */
+        margin-top: 0px;
+        line-height: 25px;
+    }
+
+    .answer img {
+        width: 100%;
+        height: auto;
+        display: block;
+        /* border-radius: 10px; */
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        object-fit: cover;
+        /* aspect-ratio: 4 / 5; */
+        /* margin-left: 10px; */
+        /* margin: 10px; */
     }
 
     /* 

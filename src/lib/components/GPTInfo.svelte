@@ -4,6 +4,7 @@
     // import Modal from "./CreateProduct.svelte";
     import UserProducts from "./Business/UserProducts.svelte"
     import { productList } from "../stores/adminStore";
+    import UiProfileComponent from "./ProfileComponent/UIProfileComponent.svelte";
     export let gptname;
     export let gptlink;
     export let gptdescription;
@@ -59,10 +60,12 @@
         </div>
     </div>
     <!-- <Modal isOpen={modalOpen} close={toggleModal}/> -->
+    
     {#if isOpenUserProductModal}
-        <UserProducts isOpen={isOpenUserProductModal} on:close={toggleUserProductModal}/>   
+        <!-- <UserProducts isOpen={isOpenUserProductModal} on:close={toggleUserProductModal}/>    -->
+        <UiProfileComponent/>
     {/if}
-     
+    
     
    
     
