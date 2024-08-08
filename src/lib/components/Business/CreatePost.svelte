@@ -226,24 +226,27 @@
                             placeholder="Si el usuario pregunta por ubicacion">
                         </textarea>
                         <div class="answer">
-                            <img 
-                            class="logo"
-                            src={imageUrl}
-                            alt="logo"
-                            on:click={() => fileInput.click()}
-                            style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
-                            />
-                            <!-- <i class="fa-regular fa-image"></i> -->
                             <div class="answer-footer">
+                                <img 
+                                class="logo"
+                                src={imageUrl}
+                                alt="logo"
+                                on:click={() => fileInput.click()}
+                                style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
+                                />
                                 <p>starbucks</p>
-                                <p id="descripcion">Agregar respuesta</p>
+                                <p id="descripcion">¿Más Joey King? ¡Más Joey King! 🤩 Basada en el bestseller 'Traición', la película 'Los feos' estará disponible en Netflix el 13 de septiembre.</p>
                                 <!-- 서로 다른 컬러와 패턴의 아이템이 하나의 룩으로 어우러질 때의 멋은 그 무엇과도 비교하기 어렵습니다 -->
                                 <!-- <textarea name="" 
                             bind:this={myTextareaAnswer} 
                             on:input={adjustTextareaHeight} 
                             placeholder="Si el usuario pregunta por ubicacion">
                         </textarea> -->
+                        <i class="fa-regular fa-image"></i>
                             </div>
+                           
+                            
+                           
                         </div>
                         </div>
                 
@@ -345,7 +348,7 @@
     }
     .messagebox__container-message textarea {
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        font-size: 15px;
+        font-size: 14px;
         width: 100%;
         resize: none;
         overflow-y: hidden;
@@ -388,6 +391,8 @@
         /* background-color: red; */
         font-family: Roboto;
         font-size: 14px;
+        color: rgb(255, 255, 255);
+        line-height: 20px;
     }
 
 
