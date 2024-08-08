@@ -17,7 +17,6 @@
     let fileInput;
 
     let myTextarea;
-    let myTextareaAnswer;
 
     let imageUrl = "imageplaceholder.jpg";
     let resizedImageBlob;
@@ -28,7 +27,7 @@
     onMount(() => {
         // window.addEventListener('resize', adjustTextareaHeight);
         myTextarea.value = "";
-        myTextareaAnswer.value = "";
+        // myTextareaAnswer.value = "";
         adjustTextareaHeight();
         console.log(window.innerWidth);
         
@@ -44,13 +43,7 @@
             // console.log(window)
             
         }
-        if (myTextareaAnswer) {
-            
-            // myTextareaAnswer.style.height = "auto";
-            // myTextareaAnswer.style.height = `${myTextareaAnswer.scrollHeight - 10}px`;
-            // console.log(window)
-            
-        }
+       
     }
 
     onDestroy(() => {
@@ -233,22 +226,23 @@
                             placeholder="Si el usuario pregunta por ubicacion">
                         </textarea>
                         <div class="answer">
-                            <img 
+                            <!-- <img 
                             class="logo"
                             src={imageUrl}
                             alt="logo"
                             on:click={() => fileInput.click()}
                             style="aspect-ratio: {imageAspectRatio}; object-fit: cover;"
-                            />
+                            /> -->
                             <!-- <i class="fa-regular fa-image"></i> -->
                             <div class="answer-footer">
                                 <p>starbucks</p>
+                                <p id="descripcion">Agregar respuesta</p>
                                 <!-- 서로 다른 컬러와 패턴의 아이템이 하나의 룩으로 어우러질 때의 멋은 그 무엇과도 비교하기 어렵습니다 -->
-                                <textarea name="" 
+                                <!-- <textarea name="" 
                             bind:this={myTextareaAnswer} 
                             on:input={adjustTextareaHeight} 
                             placeholder="Si el usuario pregunta por ubicacion">
-                        </textarea>
+                        </textarea> -->
                             </div>
                         </div>
                         </div>
@@ -377,27 +371,22 @@
     }
 
     .answer-footer{
-        margin: 20px;
-
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin: 15px;
     }
     .answer-footer p{
         font-family: Roboto;
         font-size: 12px;
     }
-    .answer-footer textarea{
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        font-size: 15px;
-        width: 100%;
-        resize: none;
-        overflow-y: hidden;
-        outline: none;
-        border: none;
-        color: #E3E3E3;
-        background-color: transparent;
-        /* align-content: center; */
-        margin-top: 0px;
-        line-height: 25px;
+
+    .answer-footer #descripcion{
+        /* background-color: red; */
+        font-family: Roboto;
+        font-size: 14px;
     }
+
 
     .answer img {
         width: 100%;
